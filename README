@@ -1,0 +1,6 @@
+A small 2 player human vs human soccer game inspired by
+the classic Amiga game Sensible Soccer.
+
+Requires PyGame.
+To run:
+    $ python start.py
