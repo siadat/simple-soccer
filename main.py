@@ -143,6 +143,17 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
             fitness1 += 1000/distance(ball_centre, players[0].pos)
             fitness2 += 1000/distance(ball_centre, players[1].pos)
 
+            # players colliding with the ball
+            for player in players:
+                ball.getKicked(player)
+            for cc in computer_creature:
+                cc.collidingGoal(goal_size)
+                ball.getKicked(cc)
+                if debug:
+                    print mouse_pos
+                cc.acc = [ (random.random()-0.5)/5.0, (random.random()-0.5)/5.0]
+                cc.move(surface, field, counter, cameraPos=cameraPos, goal_size=goal_size)
+
             # to the pipe (tirake darvaze):
             is_colliding_goal_pipe_top_right    = ( ball.vel[1] < 0 and (diff(ball_centre[1], goal_size[1]) < ball.radius)            and (diff(ball_centre[0], (width/2 + goal_size[0]/2)) < 3) )
             is_colliding_goal_pipe_top_left     = ( ball.vel[1] < 0 and (diff(ball_centre[1], goal_size[1]) < ball.radius)            and (diff(ball_centre[0], (width/2 - goal_size[0]/2)) < 3) )
@@ -174,16 +185,6 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                 players[1].fire_acc += 0.01
                 if showing: field.setMessage1()
 
-            # players colliding with the ball
-            for player in players:
-                ball.getKicked(player)
-            for cc in computer_creature:
-                cc.collidingGoal(goal_size)
-                ball.getKicked(cc)
-                if debug:
-                    print mouse_pos
-                cc.acc = [ (random.random()-0.5)/5.0, (random.random()-0.5)/5.0]
-                cc.move(surface, field, counter, cameraPos=cameraPos, goal_size=goal_size)
             if showing:
                 field.blitField(width=width, height=height, surface=surface, cameraPos=cameraPos)
 
