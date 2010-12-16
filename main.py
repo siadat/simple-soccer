@@ -183,7 +183,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                 if debug:
                     print mouse_pos
                 cc.acc = [ (random.random()-0.5)/5.0, (random.random()-0.5)/5.0]
-                cc.move(counter, cameraPos=cameraPos)
+                cc.move(surface, field, counter, cameraPos=cameraPos, goal_size=goal_size)
             if showing:
                 field.blitField(width=width, height=height, surface=surface, cameraPos=cameraPos)
 

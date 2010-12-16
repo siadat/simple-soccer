@@ -192,7 +192,7 @@ class BallBody(GeneralMovingBody):
         GeneralMovingBody.__init__(self,surface=surface,size=[radius*2,radius*2],showing=True)
         self.image, self.rect = load_image('ball.bmp', self.scale, -1)
         self.original = self.image
-        self.initial_pos = [width/2.0 + random.random()*40-20,height/2.0-random.random()*40-20]
+        self.initial_pos = [width/2.0,height/2.0]
         self.reset()
         self.move_turn = math.floor(random.random()*100)
         self.is_contact = False
