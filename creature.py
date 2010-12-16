@@ -70,20 +70,22 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
     # TODO take into consideration the velocity of the ball when colliding
     def collidingHorizontallyLeft(self, line_top, line_bottom, line_x):
-        threshold = 20
+        threshold = 5
         self_top    = self.pos[1]
         self_bottom = self.pos[1] + self.sizey
         self_left   = self.pos[0]
         self_right  = self.pos[0] + self.sizex
-        return (self_top < line_bottom and self_bottom > line_top ) and ( (diff(self_right, line_x) < threshold) and (self_right > line_x) )
+        return (self_top < line_bottom and self_bottom > line_top ) and \
+               ( (diff(self_right, line_x) < threshold) or (diff(self_left, line_x) < threshold) )
 
     def collidingHorizontallyRight(self, line_top, line_bottom, line_x):
-        threshold = 20
+        threshold = 5
         self_top    = self.pos[1]
         self_bottom = self.pos[1] + self.sizey
         self_left   = self.pos[0]
         self_right  = self.pos[0] + self.sizex
-        return (self_top < line_bottom and self_bottom > line_top ) and ( (diff(self_right, line_x) < threshold) and (self_left < line_x) )
+        return (self_top < line_bottom and self_bottom > line_top ) and \
+               ( (diff(self_right, line_x) < threshold) or (diff(self_left, line_x) < threshold) )
 
     def collidingVerticallyBottom(self, line_left, line_right, line_y):
         threshold = 2
