@@ -163,8 +163,9 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
 
     def getKicked(self, kicker):
-        """ Ball is kicker by kicker. """
-        dist = distance ( [kicker.pos[0]+ kicker.sizex/2, kicker.pos[1]+kicker.sizey/2] , [self.pos[0]+self.sizex/2, self.pos[1]+self.sizey/2] )
+        """ Ball is kicked by the kicker. """
+        dist = distance ( [kicker.pos[0]+ kicker.sizex/2, kicker.pos[1]+kicker.sizey/2], \
+                          [self.pos[0]+self.sizex/2, self.pos[1]+self.sizey/2] )
         user_touch_dist = kicker.sizex/2 + self.sizex/2
         #if self.collidingHorizontallyLeft  (line_top=kicker.pos[1],  line_bottom=kicker.pos[1]+kicker.sizey, line_x=kicker.pos[0]) \
         #or self.collidingHorizontallyRight (line_top=kicker.pos[1],  line_bottom=kicker.pos[1]+kicker.sizey, line_x=kicker.pos[0]+kicker_size[1]) \
@@ -174,9 +175,14 @@ class GeneralMovingBody(pygame.sprite.Sprite):
             self.is_under_player = True
             self.vel[0] = 2 * (self.vel[0] * (self.mass - kicker.mass) + 2 * kicker.mass * kicker.vel[0]) / (self.mass + kicker.mass)
             self.vel[1] = 2 * (self.vel[1] * (self.mass - kicker.mass) + 2 * kicker.mass * kicker.vel[1]) / (self.mass + kicker.mass)
-            self.clockwise_spin = not self.clockwise_spin 
-        else:
-            self.is_under_player = False
+            
+            if self.vel == [0,0] and self.acc == [0,0]:
+                scale = 1
+                if self.clockwise_spin == True:
+                    scale = -1
+                self.vel = [random.random()*scale, random.random()*scale]
+            else:
+                self.clockwise_spin = not self.clockwise_spin 
 
 
     def drawCoordinates(self):
@@ -212,6 +218,10 @@ class BallBody(GeneralMovingBody):
         player_centre = player.getCentre()
         drawLine(self.surface, self.color, ball_centre, player_centre)
 
+
+
+
+
     def rot_center(self, rate):
         " Spin the body. "
         center = self.rect.center
@@ -227,6 +237,10 @@ class BallBody(GeneralMovingBody):
         else:
             rotate = pygame.transform.rotate
             self.image = rotate(self.original, self.angle)
+        #scale = math.sqrt(self.vel[0] ** 2 + self.vel[1] ** 2)/20 + 1
+        #self.sizex = self.scale[0] * scale
+        #self.sizey = self.scale[1] * scale
+        #self.image = pygame.transform.scale(self.image, (self.sizex, self.sizey) )
         self.rect = self.image.get_rect(center=center)
 
     def __newpos(self):
@@ -234,8 +248,11 @@ class BallBody(GeneralMovingBody):
         for i in range(0,2):
             if self.vel[i] <= 0.001 and self.vel[i] >= -0.001:
                 self.vel[i] = 0
+                #self.sizex = self.scale[0]
+                #self.sizey = self.scale[1]
+                #self.image = pygame.transform.scale(self.image, self.scale)
             if self.vel[i] > 0.1 or self.vel[i] < -0.1:
-                self.rot_center(abs(self.vel[i])*3);
+                self.rot_center(abs(self.vel[i])*1.5);
 
             if self.vel[i] > 0: ff = -0.01
             elif self.vel[i] < 0: ff =  0.01

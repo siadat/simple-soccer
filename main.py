@@ -143,9 +143,11 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
             fitness1 += 1000/distance(ball_centre, players[0].pos)
             fitness2 += 1000/distance(ball_centre, players[1].pos)
 
+            ball.is_under_player = False
             # players colliding with the ball
             for player in players:
                 ball.getKicked(player)
+            # computer player colliding with the ball and the goal
             for cc in computer_creature:
                 cc.collidingGoal(goal_size)
                 ball.getKicked(cc)
