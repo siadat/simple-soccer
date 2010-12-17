@@ -105,11 +105,26 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
     def collidingGoal(self, goal_size):
         """ """
-        if self.collidingHorizontallyLeft (line_top=0,                   line_bottom=goal_size[1], line_x=width/2.0 - goal_size[0]/2.0) \
-        or self.collidingHorizontallyRight(line_top=0,                   line_bottom=goal_size[1], line_x=width/2.0 + goal_size[0]/2.0) \
-        or self.collidingHorizontallyLeft (line_top=height-goal_size[1], line_bottom=height,       line_x=width/2.0 - goal_size[0]/2.0) \
-        or self.collidingHorizontallyRight(line_top=height-goal_size[1], line_bottom=height,       line_x=width/2.0 + goal_size[0]/2.0):
+        self_right = self.pos[0] + self.sizex
+        self_left  = self.pos[0] - self.sizex
+        line_x = width/2.0 - goal_size[0]/2.0
+
+        if self.collidingHorizontallyLeft (line_top=0,                   line_bottom=goal_size[1], line_x=line_x) \
+        or self.collidingHorizontallyLeft (line_top=height-goal_size[1], line_bottom=height,       line_x=line_x):
             self.vel[0] = - self.vel[0]
+            if diff(self_right, line_x) < diff(self_left, line_x):
+                self.pos[0] = line_x - (self.sizex + 5)
+            else:
+                self.pos[0] = line_x + (5)
+
+        line_x = width/2.0 + goal_size[0]/2.0
+        if self.collidingHorizontallyRight(line_top=0,                   line_bottom=goal_size[1], line_x=line_x) \
+        or self.collidingHorizontallyRight(line_top=height-goal_size[1], line_bottom=height,       line_x=line_x):
+            self.vel[0] = - self.vel[0]
+            if diff(self_right, line_x) < diff(self_left, line_x):
+                self.pos[0] = line_x - (self.sizex + 5)
+            else:
+                self.pos[0] = line_x + (5)
 
     def fireLeft(self):
         """ Accelerate to the left. """
