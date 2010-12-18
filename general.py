@@ -3,10 +3,10 @@ from pygame.locals import *
 import math
 
 """ Public variables: """
-width  = 700.0;
-height = 700.0 * 2;
+width  = 700.0
+height = 700.0# * 2;
 visible_width = width
-visible_height = height/2
+visible_height = height#/2
 cameraPos = [0, 0]
 debug = not not False
 
@@ -44,13 +44,14 @@ def drawLine(surface, color, startPos, endPos):
 
 def moveCamera(ball):
     """ Move the camera relative to the ball's position and vel and acc. """
-    if diff(cameraPos[1], ball.pos[1]-visible_height/2.0) > 5:
-        if cameraPos[1] > ball.pos[1] - visible_height/2.0:
+    pos = ball.get_pos()
+    if diff(cameraPos[1], pos[1]-visible_height/2.0) > 5:
+        if cameraPos[1] > pos[1] - visible_height/2.0:
             cameraPos[1] = cameraPos[1] - abs(ball.vel[1]) - 1
-        elif cameraPos[1] < ball.pos[1] - visible_height/2.0:
+        elif cameraPos[1] < pos[1] - visible_height/2.0:
             cameraPos[1] = cameraPos[1] + abs(ball.vel[1]) + 1
 
 
-    cameraPos[1] = ball.pos[1] - visible_height/2.0
+    cameraPos[1] = pos[1] - visible_height/2.0
     if cameraPos[1] < 0: cameraPos[1] = 0
     if cameraPos[1] > height-visible_height: cameraPos[1] = height-visible_height

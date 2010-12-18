@@ -40,6 +40,9 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
         self.vel = [0, 0]
         self.acc = [0, 0]
+        ## There's no self.pos. See set_pos() and get_pos()
+        self._float_pos = [0, 0]
+
         self.initial_pos = [width/2.0, height/2.0]
         self.showing = showing
 
@@ -55,76 +58,98 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         self.fire_acc = 0.05
         self.mass = 1.0
 
+    def set_pos(self, pos):
+        self._float_pos = pos
+        self.rect.move_ip(pos[0] - self.rect.left, pos[1] - self.rect.top)
+    def get_pos(self):
+        return [self._float_pos[0], self._float_pos[1]]
+        #return [self.rect.left, self.rect.top]
+
     def reset(self):
-        self.pos = [self.initial_pos[0], self.initial_pos[1]]
+        self.set_pos(self.initial_pos)
         self.vel = [0,0]
         self.acc = [0,0]
 
     def renderImage(self, image, cameraPos):
-        self.surface.blit(image, (self.pos[0]-cameraPos[0],self.pos[1]-cameraPos[1]))
+        pos = self.get_pos()
+        self.surface.blit(image, (pos[0]-cameraPos[0], pos[1]-cameraPos[1]))
         self.drawCoordinates()
 
     def getCentre(self):
         """ Get the position of the centre of the body, given the position of topleft. """
-        return [self.pos[0] + self.sizex/2.0, self.pos[1] + self.sizey/2.0]
+        pos = self.get_pos()
+        return [pos[0] + self.sizex/2.0, pos[1] + self.sizey/2.0]
 
     # TODO take into consideration the velocity of the ball when colliding
     def collidingHorizontallyLeft(self, line_top, line_bottom, line_x):
         threshold = 5
-        self_top    = self.pos[1]
-        self_bottom = self.pos[1] + self.sizey
-        self_left   = self.pos[0]
-        self_right  = self.pos[0] + self.sizex
+        pos = self.get_pos()
+        self_top    = pos[1]
+        self_bottom = pos[1] + self.sizey
+        self_left   = pos[0]
+        self_right  = pos[0] + self.sizex
         return (self_top < line_bottom and self_bottom > line_top ) and \
                ( (diff(self_right, line_x) < threshold) or (diff(self_left, line_x) < threshold) )
 
     def collidingHorizontallyRight(self, line_top, line_bottom, line_x):
         threshold = 5
-        self_top    = self.pos[1]
-        self_bottom = self.pos[1] + self.sizey
-        self_left   = self.pos[0]
-        self_right  = self.pos[0] + self.sizex
+        pos = self.get_pos()
+        self_top    = pos[1]
+        self_bottom = pos[1] + self.sizey
+        self_left   = pos[0]
+        self_right  = pos[0] + self.sizex
         return (self_top < line_bottom and self_bottom > line_top ) and \
                ( (diff(self_right, line_x) < threshold) or (diff(self_left, line_x) < threshold) )
 
     def collidingVerticallyBottom(self, line_left, line_right, line_y):
         threshold = 2
-        self_top    = self.pos[1]
-        self_bottom = self.pos[1] + self.sizey
-        self_left   = self.pos[0]
-        self_right  = self.pos[0] + self.sizex
+        pos = self.get_pos()
+        self_top    = pos[1]
+        self_bottom = pos[1] + self.sizey
+        self_left   = pos[0]
+        self_right  = pos[0] + self.sizex
         return (self_left < line_right and self_right > line_left ) and ( (diff(self_bottom, line_y) < threshold) and (self_top < line_y) )
 
     def collidingVerticallyTop(self, line_left, line_right, line_y):
         threshold = 2
-        self_top    = self.pos[1]
-        self_bottom = self.pos[1] + self.sizey
-        self_left   = self.pos[0]
-        self_right  = self.pos[0] + self.sizex
+        pos = self.get_pos()
+        self_top    = pos[1]
+        self_bottom = pos[1] + self.sizey
+        self_left   = pos[0]
+        self_right  = pos[0] + self.sizex
         return (self_left < line_right and self_right > line_left ) and ( (diff(self_bottom, line_y) < threshold) and (self_top > line_y) )
 
-    def collidingGoal(self, goal_size):
+    def collidingGoal(self, goal):
+        goal_size = goal.image.get_size()
+        ## the goal's shape can be deconstructed into 3 rects and 2 circles.
         """ """
-        self_right = self.pos[0] + self.sizex
-        self_left  = self.pos[0] - self.sizex
+        #if not self.rect.colliderect(goal.rect):
+        #    return
+
+        pos = self.get_pos()
+        self_right = pos[0] + self.sizex
+        self_left  = pos[0] - self.sizex
         line_x = width/2.0 - goal_size[0]/2.0
+        safety_dist = self.sizex * 0.5
 
         if self.collidingHorizontallyLeft (line_top=0,                   line_bottom=goal_size[1], line_x=line_x) \
         or self.collidingHorizontallyLeft (line_top=height-goal_size[1], line_bottom=height,       line_x=line_x):
             self.vel[0] = - self.vel[0]
             if diff(self_right, line_x) < diff(self_left, line_x):
-                self.pos[0] = line_x - (self.sizex + 5)
+                pos[0] = line_x - (self.sizex + safety_dist)
             else:
-                self.pos[0] = line_x + (5)
+                pos[0] = line_x + (safety_dist)
 
         line_x = width/2.0 + goal_size[0]/2.0
         if self.collidingHorizontallyRight(line_top=0,                   line_bottom=goal_size[1], line_x=line_x) \
         or self.collidingHorizontallyRight(line_top=height-goal_size[1], line_bottom=height,       line_x=line_x):
             self.vel[0] = - self.vel[0]
             if diff(self_right, line_x) < diff(self_left, line_x):
-                self.pos[0] = line_x - (self.sizex + 5)
+                pos[0] = line_x - (self.sizex + safety_dist)
             else:
-                self.pos[0] = line_x + (5)
+                pos[0] = line_x + (safety_dist)
+
+        self.set_pos(pos)
 
     def fireLeft(self):
         """ Accelerate to the left. """
@@ -156,15 +181,19 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
     def getShooted(self, kicker):
         """ Ball is shooted by kicker. """
+        pos = self.get_pos()
+
+        kicker_pos = self.get_pos()
         kicker_centre = kicker.getCentre()
-        kicker_centre[0] = kicker.pos[0] + kicker.sizex/2.0
-        kicker_centre[1] = kicker.pos[1] + kicker.sizey/2.0
-        dist = distance ( [kicker_centre[0], kicker_centre[1]] , [self.pos[0]+self.sizex/2, self.pos[1]+self.sizey/2] )
+
+        kicker_centre[0] = kicker_pos[0] + kicker.sizex/2.0
+        kicker_centre[1] = kicker_pos[1] + kicker.sizey/2.0
+        dist = distance ( [kicker_centre[0], kicker_centre[1]] , [pos[0]+self.sizex/2, pos[1]+self.sizey/2] )
         user_touch_dist = kicker.sizex/2 + self.sizex/2
         shoot_dist = user_touch_dist + 70
         if dist < shoot_dist:
-            new_vel_0 = 2 * (self.vel[0] * (self.mass - kicker.mass) + 2 * kicker.mass * (self.pos[0]+self.sizex/2 - kicker_centre[0]) ) / (self.mass + kicker.mass)
-            new_vel_1 = 2 * (self.vel[1] * (self.mass - kicker.mass) + 2 * kicker.mass * (self.pos[1]+self.sizey/2 - kicker_centre[1]) ) / (self.mass + kicker.mass)
+            new_vel_0 = 2 * (self.vel[0] * (self.mass - kicker.mass) + 2 * kicker.mass * (pos[0]+self.sizex/2 - kicker_centre[0]) ) / (self.mass + kicker.mass)
+            new_vel_1 = 2 * (self.vel[1] * (self.mass - kicker.mass) + 2 * kicker.mass * (pos[1]+self.sizey/2 - kicker_centre[1]) ) / (self.mass + kicker.mass)
             new_vel_size = math.sqrt( new_vel_0 ** 2 + new_vel_1 ** 2 )
             new_vel_0 = 500 * (new_vel_0 / new_vel_size) / dist
             new_vel_1 = 500 * (new_vel_1 / new_vel_size) / dist
@@ -179,8 +208,10 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
     def getKicked(self, kicker):
         """ Ball is kicked by the kicker. """
-        dist = distance ( [kicker.pos[0]+ kicker.sizex/2, kicker.pos[1]+kicker.sizey/2], \
-                          [self.pos[0]+self.sizex/2, self.pos[1]+self.sizey/2] )
+        pos = self.get_pos()
+        kicker_pos = kicker.get_pos()
+        dist = distance ( [kicker_pos[0]+ kicker.sizex/2, kicker_pos[1]+kicker.sizey/2], \
+                          [pos[0]+self.sizex/2, pos[1]+self.sizey/2] )
         user_touch_dist = kicker.sizex/2 + self.sizex/2
         #if self.collidingHorizontallyLeft  (line_top=kicker.pos[1],  line_bottom=kicker.pos[1]+kicker.sizey, line_x=kicker.pos[0]) \
         #or self.collidingHorizontallyRight (line_top=kicker.pos[1],  line_bottom=kicker.pos[1]+kicker.sizey, line_x=kicker.pos[0]+kicker_size[1]) \
@@ -222,6 +253,8 @@ class BallBody(GeneralMovingBody):
         self.clockwise_spin = False
         self.radius = radius
         #self.mass = 1
+        #self.rect.move_ip(self.pos[0], self.pos[1])
+        self.set_pos(self.initial_pos)
 
     def move(self, time, cameraPos, target=None):
         self.__time = time
@@ -232,10 +265,6 @@ class BallBody(GeneralMovingBody):
         ball_centre = self.getCentre()
         player_centre = player.getCentre()
         drawLine(self.surface, self.color, ball_centre, player_centre)
-
-
-
-
 
     def rot_center(self, rate):
         " Spin the body. "
@@ -258,8 +287,10 @@ class BallBody(GeneralMovingBody):
         #self.image = pygame.transform.scale(self.image, (self.sizex, self.sizey) )
         self.rect = self.image.get_rect(center=center)
 
+        
     def __newpos(self):
         limit = [self.limitx, self.limity]
+        pos = self.get_pos()
         for i in range(0,2):
             if self.vel[i] <= 0.001 and self.vel[i] >= -0.001:
                 self.vel[i] = 0
@@ -277,13 +308,15 @@ class BallBody(GeneralMovingBody):
             if self.vel[i] <= 0.001 and self.vel[i] >= -0.001:
                 self.vel[i] = 0
 
-            if self.pos[i] > limit[i]:
-                self.pos[i] = limit[i]
-                self.vel[i] = -self.vel[i] * 2.0/5.0
-            elif self.pos[i] < 0:
-                self.pos[i] = 0
-                self.vel[i] = -self.vel[i] * 2.0/5.0
-            self.pos[i] = self.pos[i] + self.vel[i]
+            if pos[i] > limit[i]:
+                pos[i] = limit[i]
+                self.vel[i] = -self.vel[i] * 4.0/5.0
+            elif pos[i] < 0:
+                pos[i] = 0
+                self.vel[i] = -self.vel[i] * 4.0/5.0
+
+            pos[i] = pos[i] + self.vel[i]
+        self.set_pos(pos)
 
 
 
@@ -326,8 +359,6 @@ class CreatureBody(GeneralMovingBody):
         self.standing_direction = 'front'
 
     def move(self, surface, field, time, cameraPos, goal_size):
-        """ players colliding with the goals """
-        self.collidingGoal(goal_size)
         """ stopping the player, if keyup """
         if self.stoppingx:
             self.vel[0] += - self.vel[0]/2.0
@@ -338,10 +369,11 @@ class CreatureBody(GeneralMovingBody):
         self.__newpos()
         if self.showing: self.__walk(time, cameraPos)
         """ draw indicators if player is outside visible area """
-        if self.pos[1] + self.sizey < cameraPos[1]:
-            pygame.draw.rect(surface, self.color, (self.pos[0]+self.sizex/2.0 - field.getBarWidth()/2.0, 0, field.getBarWidth(), 10))
-        if self.pos[1] > cameraPos[1] + visible_height:
-            pygame.draw.rect(surface, self.color, (self.pos[0]+self.sizex/2.0 - field.getBarWidth()/2.0, visible_height, field.getBarWidth(),-10))
+        pos = self.get_pos()
+        if pos[1] + self.sizey < cameraPos[1]:
+            pygame.draw.rect(surface, self.color, (pos[0]+self.sizex/2.0 - field.getBarWidth()/2.0, 0, field.getBarWidth(), 10))
+        if pos[1] > cameraPos[1] + visible_height:
+            pygame.draw.rect(surface, self.color, (pos[0]+self.sizex/2.0 - field.getBarWidth()/2.0, visible_height, field.getBarWidth(),-10))
 
 
     def __walk(self, time, cameraPos):
@@ -389,6 +421,7 @@ class CreatureBody(GeneralMovingBody):
     def __newpos(self):
         """ Update player's position """
         limit = [self.limitx, self.limity]
+        pos = self.get_pos()
         for i in range(0,2):
             self.vel[i] = self.vel[i] + self.acc[i]
             if self.vel[i] <= 0.001 and self.vel[i] >= -0.001:
@@ -398,13 +431,14 @@ class CreatureBody(GeneralMovingBody):
             elif self.vel[i] < -self.vel_threshold: self.vel[i] = -self.vel_threshold
 
 
-            if self.pos[i] > limit[i]:
-                self.pos[i] = limit[i]
+            if pos[i] > limit[i]:
+                pos[i] = limit[i]
                 self.vel[i] = -self.vel[i] * 3.0/5.0
-            elif self.pos[i] < 0:
-                self.pos[i] = 0
+            elif pos[i] < 0:
+                pos[i] = 0
                 self.vel[i] = -self.vel[i] * 3.0/5.0
-            self.pos[i] = self.pos[i] + self.vel[i]
+            pos[i] = pos[i] + self.vel[i]
+        self.set_pos(pos)
 
 # }}}
 #{{{ CreatureBodyComputer 

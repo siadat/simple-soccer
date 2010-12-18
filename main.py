@@ -1,5 +1,5 @@
 # {{{ Imports
-import pygame, sys, os
+import pygame, sys #, os
 from general import *
 import random
 from pygame.locals import *
@@ -31,6 +31,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
         rootNode2_accy = rootNode2_acc[1]
 
     if showing: pygame.init()
+    if showing: os.environ['SDL_VIDEO_CENTERED'] = '1'
     if showing: pygame.mouse.set_visible(False)
     
     if showing:
@@ -66,7 +67,9 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
         stoppingy_event = False
         new_key = False
         mouse_pos = pygame.mouse.get_pos()
-        goal_size = field.getGoal1().get_size()
+        goal1 = field.getGoal1()
+        goal2 = field.getGoal2()
+        goal_size = goal1.image.get_size()
 
         if online:
             ball = balls[0]
@@ -140,8 +143,8 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
             """ All balls """
             ball_centre = ball.getCentre()
             
-            fitness1 += 1000/distance(ball_centre, players[0].pos)
-            fitness2 += 1000/distance(ball_centre, players[1].pos)
+            #fitness1 += 1000/distance(ball_centre, players[0].get_pos())
+            #fitness2 += 1000/distance(ball_centre, players[1].get_pos())
 
             ball.is_under_player = False
             # players colliding with the ball
@@ -167,7 +170,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
             else:
                 ball.collidingGoal(goal_size) 
 
-            if (ball_centre[1] < goal_size[1] and abs(ball_centre[0] - width/2) < goal_size[0]/2 - 3) :
+            if goal1.rect.contains(ball.rect):
                 fitness2 += 100
                 field.score2+=1
                 ball.reset()
@@ -175,9 +178,8 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                 players[1].reset()
                 players[0].fire_acc += 0.01
                 players[1].fire_acc += 0.01
-
                 if showing: field.setMessage2()
-            elif (ball_centre[1] > height - goal_size[1] and abs(ball_centre[0] - width/2) < goal_size[0]/2 - 3):
+            elif goal2.rect.contains(ball.rect):
                 fitness1 += 100
                 field.score1+=1
                 ball.reset()

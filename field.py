@@ -4,10 +4,13 @@ class Field():
     def __init__(self):
         self.__grass_field, rect = load_image(filepath="grass.jpg");# grass1000x1000.bmp");
         self.__grass_field = self.__grass_field.convert()
-        self.__goal1, rect = load_image(filepath="goal2.bmp")
-        self.__goal2 = pygame.transform.flip(self.__goal1, False, True)
-        self.__goal1 = self.__goal1.convert_alpha()
-        self.__goal2 = self.__goal2.convert_alpha()
+
+        self.__goal1 = Goal()
+        self.__goal2 = Goal()
+        self.__goal1.rect.move_ip(width/2.0 - self.__goal1.image.get_size()[0]/2.0, 0)
+        self.__goal2.rect.move_ip(width/2.0 - self.__goal2.image.get_size()[0]/2.0, height - self.__goal2.image.get_size()[1])
+        self.__goal2.image = pygame.transform.flip(self.__goal1.image, False, True)
+
         self.__font = pygame.font.Font(None, 76)
         self.__message1 = self.__font.render(str(0), True, (30, 40, 210))
         self.__message2 = self.__font.render(str(0), True, (210, 40, 30))
@@ -45,8 +48,9 @@ class Field():
         """ Blit messages and the goals. """
         surface.blit(self.__message1,(0,0))
         surface.blit(self.__message2,(0,50))
-        surface.blit(self.__goal1, (width/2.0 - self.__goal1.get_size()[0]/2.0 - cameraPos[0], 0 - cameraPos[1]))
-        surface.blit(self.__goal2, (width/2.0 - self.__goal1.get_size()[0]/2.0 - cameraPos[0], height - self.__goal2.get_size()[1] - cameraPos[1]))
+
+        surface.blit(self.__goal1.image, (self.__goal1.rect.left - cameraPos[0], self.__goal1.rect.top - cameraPos[1]) )
+        surface.blit(self.__goal2.image, (self.__goal2.rect.left - cameraPos[0], self.__goal2.rect.top - cameraPos[1]) )
 
     def blitBackground(self, surface):
         """ Blit the background field. """
@@ -57,3 +61,10 @@ class Field():
                 surface.blit(self.getField(), (
                     i * self.getField().get_size()[0]-cameraPos[0],
                     j * self.getField().get_size()[1]-cameraPos[1]))
+
+class Goal(pygame.sprite.Sprite):
+    """ The class for the goal."""
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image, self.rect = load_image(filepath="goal2.bmp")
+        self.image = self.image.convert_alpha()
