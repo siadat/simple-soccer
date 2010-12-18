@@ -4,6 +4,7 @@ import random
 import math
 from pygame.locals import *
 from general import *
+import general #import *
 # }}}
 # {{{ Keyboard 
 class Keyboard():
@@ -19,6 +20,8 @@ class Keyboard():
     def isD(self): return self.__pygame_event.key == pygame.K_d;
     def isW(self): return self.__pygame_event.key == pygame.K_w;
     def isS(self): return self.__pygame_event.key == pygame.K_s;
+    def isEquals(self): return self.__pygame_event.key == pygame.K_EQUALS;
+    def isMinus(self): return self.__pygame_event.key == pygame.K_MINUS;
     def isPeriod(self): return self.__pygame_event.key == pygame.K_PERIOD;
     def isComma(self): return self.__pygame_event.key == pygame.K_COMMA;
     def isBackquote(self): return self.__pygame_event.key == pygame.K_BACKQUOTE;
@@ -61,6 +64,7 @@ class GeneralMovingBody(pygame.sprite.Sprite):
     def set_pos(self, pos):
         self._float_pos = pos
         self.rect.move_ip(pos[0] - self.rect.left, pos[1] - self.rect.top)
+
     def get_pos(self):
         return [self._float_pos[0], self._float_pos[1]]
 
@@ -71,7 +75,13 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
     def renderImage(self, image, cameraPos):
         pos = self.get_pos()
-        self.surface.blit(image, (pos[0]-cameraPos[0], pos[1]-cameraPos[1]))
+        pos = [pos[0] - cameraPos[0], pos[1] - cameraPos[1]]
+        global_zoom = general.global_zoom
+        if global_zoom != 1: 
+            size = image.get_size()
+            image = pygame.transform.scale(image, [int(size[0]*global_zoom), int(size[1]*global_zoom)])
+            pos = [pos[0] * global_zoom, pos[1] * global_zoom]
+        self.surface.blit(image, (pos[0], pos[1]))
         self.drawCoordinates()
 
     def getCentre(self):
@@ -166,13 +176,13 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         kicker_centre[1] = kicker_pos[1] + kicker.sizey/2.0
         dist = distance ( [kicker_centre[0], kicker_centre[1]] , [pos[0]+self.sizex/2, pos[1]+self.sizey/2] )
         user_touch_dist = kicker.sizex/2 + self.sizex/2
-        shoot_dist = user_touch_dist + 70
+        shoot_dist = user_touch_dist + 40
         if dist < shoot_dist:
             new_vel_0 = 2 * (self.vel[0] * (self.mass - kicker.mass) + 2 * kicker.mass * (pos[0]+self.sizex/2 - kicker_centre[0]) ) / (self.mass + kicker.mass)
             new_vel_1 = 2 * (self.vel[1] * (self.mass - kicker.mass) + 2 * kicker.mass * (pos[1]+self.sizey/2 - kicker_centre[1]) ) / (self.mass + kicker.mass)
             new_vel_size = math.sqrt( new_vel_0 ** 2 + new_vel_1 ** 2 )
-            new_vel_0 = 300 * (new_vel_0 / new_vel_size) / dist
-            new_vel_1 = 300 * (new_vel_1 / new_vel_size) / dist
+            new_vel_0 = 200 * (new_vel_0 / new_vel_size) / dist
+            new_vel_1 = 200 * (new_vel_1 / new_vel_size) / dist
             self.vel[0] = new_vel_0
             self.vel[1] = new_vel_1
             self.clockwise_spin = not self.clockwise_spin 
@@ -339,20 +349,48 @@ class CreatureBody(GeneralMovingBody):
     def move(self, surface, field, time, cameraPos, goal_size):
         """ stopping the player, if keyup """
         if self.stoppingx:
-            self.vel[0] += - self.vel[0]/2.0
+            self.vel[0] += - self.vel[0]/15.0
             self.acc[0] = 0
         if self.stoppingy:
-            self.vel[1] += - self.vel[1]/2.0
+            self.vel[1] += - self.vel[1]/15.0
             self.acc[1] = 0
         self.__newpos()
         if self.showing: self.__walk(time, cameraPos)
         """ draw indicators if player is outside visible area """
         pos = self.get_pos()
+        vis = general.getVisibleSize()
         if pos[1] + self.sizey < cameraPos[1]:
-            pygame.draw.rect(surface, self.color, (pos[0]+self.sizex/2.0 - field.getBarWidth()/2.0, 0, field.getBarWidth(), 10))
-        if pos[1] > cameraPos[1] + visible_height:
-            pygame.draw.rect(surface, self.color, (pos[0]+self.sizex/2.0 - field.getBarWidth()/2.0, visible_height, field.getBarWidth(),-10))
+            # marker will always be visible (limited to visible area from camera)
+            pos[0] = general.hardlimit(pos[0], cameraPos[0], cameraPos[0] + vis[0] - self.sizex)
+            topleft = [pos[0]+self.sizex/2.0 - field.getBarWidth()/2.0 - cameraPos[0], 0]
+            topleft = [topleft[0]*general.global_zoom, topleft[1]*general.global_zoom]
+            size    = [field.getBarWidth(), 10]
+            rect = pygame.Rect(topleft, size)
+            pygame.draw.rect(surface, self.color, rect)
+        elif pos[1] > cameraPos[1] + vis[1]:
+            pos[0] = general.hardlimit(pos[0], cameraPos[0], cameraPos[0] + vis[0] - self.sizex)
+            topleft = [pos[0]+self.sizex/2.0 - field.getBarWidth()/2.0 - cameraPos[0], vis[1]]
+            topleft = [topleft[0]*general.global_zoom, topleft[1]*general.global_zoom]
+            size    = [field.getBarWidth(),-10]
+            rect = pygame.Rect(topleft, size)
+            pygame.draw.rect(surface, self.color, rect)
 
+        # because pos was overwritten, get it again:
+        pos = self.get_pos()
+        if pos[0] + self.sizex < cameraPos[0]:
+            pos[1] = general.hardlimit(pos[1], cameraPos[1], cameraPos[1] + vis[1] - self.sizey)
+            topleft = [0, pos[1]+self.sizey/2.0 - field.getBarWidth()/2.0 -cameraPos[1]]
+            topleft = [topleft[0]*general.global_zoom, topleft[1]*general.global_zoom]
+            size = [10, field.getBarWidth()]
+            rect = pygame.Rect(topleft, size)
+            pygame.draw.rect(surface, self.color, rect)
+        elif pos[0] > cameraPos[0] + vis[0]:
+            pos[1] = general.hardlimit(pos[1], cameraPos[1], cameraPos[1] + vis[1] - self.sizey)
+            topleft = [vis[0], pos[1]+self.sizey/2.0 - field.getBarWidth()/2.0 -cameraPos[1]]
+            topleft = [topleft[0]*general.global_zoom, topleft[1]*general.global_zoom]
+            size = [-10, field.getBarWidth()]
+            rect = pygame.Rect(topleft, size)
+            pygame.draw.rect(surface, self.color, rect)
 
     def __walk(self, time, cameraPos):
         """ Render (blit) approprate image depending on direction the player is facing. """

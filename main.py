@@ -1,6 +1,7 @@
 # {{{ Imports
 import pygame, sys #, os
-from general import *
+#from general import *
+import general # import *
 import random
 from pygame.locals import *
 from creature import *
@@ -35,7 +36,8 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
     if showing: pygame.mouse.set_visible(False)
     
     if showing:
-        window = pygame.display.set_mode( (int(visible_width), int(visible_height)), pygame.DOUBLEBUF)# , pygame.FULLSCREEN)
+        vis = general.getVisibleSize()
+        window = pygame.display.set_mode( (int(vis[0]), int(vis[1])), pygame.DOUBLEBUF)# , pygame.FULLSCREEN)
     else:
         window = pygame.display.set_mode((100,100))
     
@@ -99,6 +101,10 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                 if whatkey.isKEYDOWN():
                     if whatkey.isEscape():
                         sys.exit(0)
+                    elif whatkey.isEquals():
+                        general.global_zoom *= 1.1
+                    elif whatkey.isMinus():
+                        general.global_zoom /= 1.1
                     elif whatkey.isLeft():
                         players[0].fireLeft()
                     elif whatkey.isRight():
@@ -198,6 +204,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                 field.blitField(width=width, height=height, surface=surface, cameraPos=cameraPos)
 
 
-        if debug: pygame.draw.rect(surface, pygame.Color(0,0,0), (0,0, visible_width,visible_height),1)
+        vis = general.getVisibleSize()
+        if debug: pygame.draw.rect(surface, pygame.Color(0,0,0), (0,0, vis[0],vis[1]),1)
         if showing:pygame.display.flip()
     return (1.0 * fitness1/counter, 1.0 * fitness2/counter)

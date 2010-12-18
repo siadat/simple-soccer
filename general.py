@@ -5,10 +5,31 @@ import math
 """ Public variables: """
 width  = 200.0 * 3
 height = 200.0 * 4
-visible_width = width
+visible_width = width - 100
 visible_height = height - 100
 cameraPos = [0, 0]
+global_zoom = 1
 debug = not not False
+
+def getVisibleSize():
+    vis_x = visible_width  / global_zoom
+    vis_y = visible_height / global_zoom
+    if vis_x > width:  vis_x = width
+    if vis_y > height: vis_y = height
+    return [vis_x, vis_y]
+
+
+def hardlimit(value, uplimit, downlimit):
+    if downlimit > uplimit:
+        tmp = uplimit
+        uplimit = downlimit
+        downlimit = tmp
+    if value > uplimit:
+        return uplimit
+    elif value < downlimit:
+        return downlimit
+    else:
+        return value
 
 def load_image(filepath, scale=None, colorkey=None):
     """ Load an image. """
@@ -38,20 +59,23 @@ def diff(value1, value2):
 
 def drawLine(surface, color, startPos, endPos):
     """ Draw a line given the end points, a color and a surface. """
-    pygame.draw.line( surface, color,
-            [startPos[0] - cameraPos[0], startPos[1] - cameraPos[1]],
-            [endPos[0] - cameraPos[0], endPos[1] - cameraPos[1]])
+    startPos[0] = (startPos[0] - cameraPos[0]) * global_zoom
+    startPos[1] = (startPos[1] - cameraPos[1]) * global_zoom
+    endPos[0] = (endPos[0] - cameraPos[0]) * global_zoom
+    endPos[1] = (endPos[1] - cameraPos[1]) * global_zoom
+    pygame.draw.line( surface, color, startPos, endPos)
 
 def moveCamera(ball):
     """ Move the camera relative to the ball's position and vel and acc. """
-    pos = ball.get_pos()
-    if diff(cameraPos[1], pos[1]-visible_height/2.0) > 5:
-        if cameraPos[1] > pos[1] - visible_height/2.0:
-            cameraPos[1] = cameraPos[1] - abs(ball.vel[1]) - 1
-        elif cameraPos[1] < pos[1] - visible_height/2.0:
-            cameraPos[1] = cameraPos[1] + abs(ball.vel[1]) + 1
+    pos = ball.getCentre()
+    vis = getVisibleSize()
+    cameraPos[0] = pos[0] - vis[0]/2.0
+    cameraPos[1] = pos[1] - vis[1]/2.0
+    #global global_zoom
+    #global_zoom = 1 + abs(cameraPos[1]/3000.0)
+    
+    if cameraPos[0] < 0: cameraPos[0] = 0
+    if cameraPos[0] > width-vis[0]: cameraPos[0] = width-vis[0]
 
-
-    cameraPos[1] = pos[1] - visible_height/2.0
     if cameraPos[1] < 0: cameraPos[1] = 0
-    if cameraPos[1] > height-visible_height: cameraPos[1] = height-visible_height
+    if cameraPos[1] > height-vis[1]: cameraPos[1] = height-vis[1]
