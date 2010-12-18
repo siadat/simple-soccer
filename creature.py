@@ -63,7 +63,6 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         self.rect.move_ip(pos[0] - self.rect.left, pos[1] - self.rect.top)
     def get_pos(self):
         return [self._float_pos[0], self._float_pos[1]]
-        #return [self.rect.left, self.rect.top]
 
     def reset(self):
         self.set_pos(self.initial_pos)
@@ -123,33 +122,39 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         goal_size = goal.image.get_size()
         ## the goal's shape can be deconstructed into 3 rects and 2 circles.
         """ """
-        #if not self.rect.colliderect(goal.rect):
-        #    return
 
         pos = self.get_pos()
         self_right = pos[0] + self.sizex
-        self_left  = pos[0] - self.sizex
-        line_x = width/2.0 - goal_size[0]/2.0
-        safety_dist = self.sizex * 0.5
+        self_left  = pos[0]# - self.sizex
 
-        if self.collidingHorizontallyLeft (line_top=0,                   line_bottom=goal_size[1], line_x=line_x) \
-        or self.collidingHorizontallyLeft (line_top=height-goal_size[1], line_bottom=height,       line_x=line_x):
-            self.vel[0] = - self.vel[0]
-            if diff(self_right, line_x) < diff(self_left, line_x):
-                pos[0] = line_x - (self.sizex + safety_dist)
-            else:
-                pos[0] = line_x + (safety_dist)
+        goal_left  = goal.get_left_rect()
+        goal_right = goal.get_right_rect()
 
-        line_x = width/2.0 + goal_size[0]/2.0
-        if self.collidingHorizontallyRight(line_top=0,                   line_bottom=goal_size[1], line_x=line_x) \
-        or self.collidingHorizontallyRight(line_top=height-goal_size[1], line_bottom=height,       line_x=line_x):
+        line_left  = goal_left.left
+        line_right = goal_left.right
+
+        safety_dist = abs(self.vel[0] * 2) #self.sizex * 0.5
+
+        if self.rect.colliderect(goal_left):
             self.vel[0] = - self.vel[0]
-            if diff(self_right, line_x) < diff(self_left, line_x):
-                pos[0] = line_x - (self.sizex + safety_dist)
+            if diff(self_right, line_left) < diff(self_left, line_right):
+                pos[0] = line_left  - (self.sizex + safety_dist)
             else:
-                pos[0] = line_x + (safety_dist)
+                pos[0] = line_right + (safety_dist)
+
+        line_left  = goal_right.left
+        line_right = goal_right.right
+
+        if self.rect.colliderect(goal_right):
+            print 1
+            self.vel[0] = - self.vel[0]
+            if diff(self_right, line_left) < diff(self_left, line_right):
+                pos[0] = line_left -  (self.sizex + safety_dist)
+            else:
+                pos[0] = line_right + (safety_dist)
 
         self.set_pos(pos)
+        return
 
     def fireLeft(self):
         """ Accelerate to the left. """
@@ -246,15 +251,17 @@ class BallBody(GeneralMovingBody):
         GeneralMovingBody.__init__(self,surface=surface,size=[radius*2,radius*2],showing=True)
         self.image, self.rect = load_image('ball.bmp', self.scale, -1)
         self.original = self.image
-        self.initial_pos = [width/2.0,height/2.0]
+        
+
         self.reset()
         self.move_turn = math.floor(random.random()*100)
         self.is_contact = False
         self.clockwise_spin = False
         self.radius = radius
-        #self.mass = 1
-        #self.rect.move_ip(self.pos[0], self.pos[1])
+        
+        self.initial_pos = [width/2.0,height/2.0]
         self.set_pos(self.initial_pos)
+        self.vel = [0,0]
 
     def move(self, time, cameraPos, target=None):
         self.__time = time

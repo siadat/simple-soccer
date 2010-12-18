@@ -5,11 +5,10 @@ class Field():
         self.__grass_field, rect = load_image(filepath="grass.jpg");# grass1000x1000.bmp");
         self.__grass_field = self.__grass_field.convert()
 
-        self.__goal1 = Goal()
-        self.__goal2 = Goal()
+        self.__goal1 = Goal("down")
+        self.__goal2 = Goal("up")
         self.__goal1.rect.move_ip(width/2.0 - self.__goal1.image.get_size()[0]/2.0, 0)
         self.__goal2.rect.move_ip(width/2.0 - self.__goal2.image.get_size()[0]/2.0, height - self.__goal2.image.get_size()[1])
-        self.__goal2.image = pygame.transform.flip(self.__goal1.image, False, True)
 
         self.__font = pygame.font.Font(None, 76)
         self.__message1 = self.__font.render(str(0), True, (30, 40, 210))
@@ -64,7 +63,18 @@ class Field():
 
 class Goal(pygame.sprite.Sprite):
     """ The class for the goal."""
-    def __init__(self):
+    def __init__(self, direction):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = load_image(filepath="goal2.bmp")
         self.image = self.image.convert_alpha()
+        self.direction = direction
+
+        if direction == 'up':
+            self.image = pygame.transform.flip(self.image, False, True)
+
+    def get_left_rect(self):
+        return pygame.Rect(self.rect.topleft,     (5, self.image.get_size()[1]))
+    def get_right_rect(self):
+        return pygame.Rect((self.rect.right - 5, self.rect.top), (5, self.image.get_size()[1]))
+    def get_back_rect(self):
+        return pygame.Rect(self.rect.topleft, (self.image.get_size()[0]), 5)

@@ -137,6 +137,8 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
 
         
         for player in players:
+            player.collidingGoal(goal1)
+            player.collidingGoal(goal2)
             player.move(surface, field, counter, cameraPos=cameraPos, goal_size=goal_size)
 
         for ball in balls:
@@ -152,7 +154,8 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                 ball.getKicked(player)
             # computer player colliding with the ball and the goal
             for cc in computer_creature:
-                cc.collidingGoal(goal_size)
+                cc.collidingGoal(goal1)
+                cc.collidingGoal(goal2)
                 ball.getKicked(cc)
                 if debug:
                     print mouse_pos
@@ -168,7 +171,8 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
             if is_colliding_goal_pipe_top_right or is_colliding_goal_pipe_top_left or is_colliding_goal_pipe_bottom_right or is_colliding_goal_pipe_bottom_left:
                 ball.vel[1] = - ball.vel[1]
             else:
-                ball.collidingGoal(goal_size) 
+                ball.collidingGoal(goal1) 
+                ball.collidingGoal(goal2) 
 
             if goal1.rect.contains(ball.rect):
                 fitness2 += 100
