@@ -55,7 +55,7 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         self.health = 0.0
         self.age    = 0.0
         self.angle  = 0.0
-        self.fire_acc = 0.04
+        self.fire_acc = 0.01
         self.mass = 1.0
 
     def set_pos(self, pos):
@@ -159,7 +159,7 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         """ Ball is shooted by kicker. """
         pos = self.get_pos()
 
-        kicker_pos = self.get_pos()
+        kicker_pos = kicker.get_pos()
         kicker_centre = kicker.getCentre()
 
         kicker_centre[0] = kicker_pos[0] + kicker.sizex/2.0
@@ -171,8 +171,8 @@ class GeneralMovingBody(pygame.sprite.Sprite):
             new_vel_0 = 2 * (self.vel[0] * (self.mass - kicker.mass) + 2 * kicker.mass * (pos[0]+self.sizex/2 - kicker_centre[0]) ) / (self.mass + kicker.mass)
             new_vel_1 = 2 * (self.vel[1] * (self.mass - kicker.mass) + 2 * kicker.mass * (pos[1]+self.sizey/2 - kicker_centre[1]) ) / (self.mass + kicker.mass)
             new_vel_size = math.sqrt( new_vel_0 ** 2 + new_vel_1 ** 2 )
-            new_vel_0 = 500 * (new_vel_0 / new_vel_size) / dist
-            new_vel_1 = 500 * (new_vel_1 / new_vel_size) / dist
+            new_vel_0 = 300 * (new_vel_0 / new_vel_size) / dist
+            new_vel_1 = 300 * (new_vel_1 / new_vel_size) / dist
             self.vel[0] = new_vel_0
             self.vel[1] = new_vel_1
             self.clockwise_spin = not self.clockwise_spin 
@@ -276,7 +276,7 @@ class BallBody(GeneralMovingBody):
                 #self.sizey = self.scale[1]
                 #self.image = pygame.transform.scale(self.image, self.scale)
             if self.vel[i] > 0.1 or self.vel[i] < -0.1:
-                self.rot_center(abs(self.vel[i])*1.5);
+                self.rot_center(abs(self.vel[i])*4);
 
             if self.vel[i] > 0: ff = -0.01
             elif self.vel[i] < 0: ff =  0.01
@@ -404,7 +404,7 @@ class CreatureBody(GeneralMovingBody):
             self.vel[i] = self.vel[i] + self.acc[i]
             if self.vel[i] <= 0.001 and self.vel[i] >= -0.001:
                 self.vel[i] = 0
-            self.vel_threshold = 6
+            self.vel_threshold = 1.2
             if   self.vel[i] >  self.vel_threshold: self.vel[i] =  self.vel_threshold
             elif self.vel[i] < -self.vel_threshold: self.vel[i] = -self.vel_threshold
 

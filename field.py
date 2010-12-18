@@ -94,8 +94,3 @@ class Goal(pygame.sprite.Sprite):
             return pygame.Rect(l, b - 5, sizex, 5)
         else:
             return pygame.Rect(l, t, sizex, 5)
-
-
-
-
-
