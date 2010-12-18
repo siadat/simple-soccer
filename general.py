@@ -3,10 +3,10 @@ from pygame.locals import *
 import math
 
 """ Public variables: """
-width  = 700.0
-height = 700.0# * 2;
+width  = 200.0 * 3
+height = 200.0 * 4
 visible_width = width
-visible_height = height#/2
+visible_height = height - 100
 cameraPos = [0, 0]
 debug = not not False
 

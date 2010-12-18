@@ -2,13 +2,13 @@ from general import *
 class Field():
     """ Methods and properties related to rendering the field, goals, goals and scores. """
     def __init__(self):
-        self.__grass_field, rect = load_image(filepath="grass.jpg");# grass1000x1000.bmp");
+        self.__grass_field, rect = load_image(filepath="grass.jpg");
         self.__grass_field = self.__grass_field.convert()
 
         self.__goal1 = Goal("down")
         self.__goal2 = Goal("up")
-        self.__goal1.rect.move_ip(width/2.0 - self.__goal1.image.get_size()[0]/2.0, 0)
-        self.__goal2.rect.move_ip(width/2.0 - self.__goal2.image.get_size()[0]/2.0, height - self.__goal2.image.get_size()[1])
+        self.__goal1.rect.move_ip(width/2.0 - self.__goal1.image.get_size()[0]/2.0, 0 + 50)
+        self.__goal2.rect.move_ip(width/2.0 - self.__goal2.image.get_size()[0]/2.0, height - self.__goal2.image.get_size()[1] - 50)
 
         self.__font = pygame.font.Font(None, 76)
         self.__message1 = self.__font.render(str(0), True, (30, 40, 210))
@@ -73,8 +73,29 @@ class Goal(pygame.sprite.Sprite):
             self.image = pygame.transform.flip(self.image, False, True)
 
     def get_left_rect(self):
-        return pygame.Rect(self.rect.topleft,     (5, self.image.get_size()[1]))
+        l = self.rect.left
+        t = self.rect.top
+        sizey = self.image.get_size()[1]
+        return pygame.Rect(l, t, 5, sizey)
+
     def get_right_rect(self):
-        return pygame.Rect((self.rect.right - 5, self.rect.top), (5, self.image.get_size()[1]))
+        r = self.rect.right
+        t = self.rect.top
+        sizey = self.image.get_size()[1]
+        return pygame.Rect(r - 5, t, 5, sizey)
+
     def get_back_rect(self):
-        return pygame.Rect(self.rect.topleft, (self.image.get_size()[0]), 5)
+        l = self.rect.left
+        t = self.rect.top
+        b = self.rect.bottom
+        sizex = self.image.get_size()[0]
+
+        if self.direction == 'up':
+            return pygame.Rect(l, b - 5, sizex, 5)
+        else:
+            return pygame.Rect(l, t, sizex, 5)
+
+
+
+
+

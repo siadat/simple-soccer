@@ -55,7 +55,7 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         self.health = 0.0
         self.age    = 0.0
         self.angle  = 0.0
-        self.fire_acc = 0.05
+        self.fire_acc = 0.04
         self.mass = 1.0
 
     def set_pos(self, pos):
@@ -79,79 +79,50 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         pos = self.get_pos()
         return [pos[0] + self.sizex/2.0, pos[1] + self.sizey/2.0]
 
-    # TODO take into consideration the velocity of the ball when colliding
-    def collidingHorizontallyLeft(self, line_top, line_bottom, line_x):
-        threshold = 5
-        pos = self.get_pos()
-        self_top    = pos[1]
-        self_bottom = pos[1] + self.sizey
-        self_left   = pos[0]
-        self_right  = pos[0] + self.sizex
-        return (self_top < line_bottom and self_bottom > line_top ) and \
-               ( (diff(self_right, line_x) < threshold) or (diff(self_left, line_x) < threshold) )
-
-    def collidingHorizontallyRight(self, line_top, line_bottom, line_x):
-        threshold = 5
-        pos = self.get_pos()
-        self_top    = pos[1]
-        self_bottom = pos[1] + self.sizey
-        self_left   = pos[0]
-        self_right  = pos[0] + self.sizex
-        return (self_top < line_bottom and self_bottom > line_top ) and \
-               ( (diff(self_right, line_x) < threshold) or (diff(self_left, line_x) < threshold) )
-
-    def collidingVerticallyBottom(self, line_left, line_right, line_y):
-        threshold = 2
-        pos = self.get_pos()
-        self_top    = pos[1]
-        self_bottom = pos[1] + self.sizey
-        self_left   = pos[0]
-        self_right  = pos[0] + self.sizex
-        return (self_left < line_right and self_right > line_left ) and ( (diff(self_bottom, line_y) < threshold) and (self_top < line_y) )
-
-    def collidingVerticallyTop(self, line_left, line_right, line_y):
-        threshold = 2
-        pos = self.get_pos()
-        self_top    = pos[1]
-        self_bottom = pos[1] + self.sizey
-        self_left   = pos[0]
-        self_right  = pos[0] + self.sizex
-        return (self_left < line_right and self_right > line_left ) and ( (diff(self_bottom, line_y) < threshold) and (self_top > line_y) )
-
     def collidingGoal(self, goal):
         goal_size = goal.image.get_size()
-        ## the goal's shape can be deconstructed into 3 rects and 2 circles.
+        ## the goal's shape can be deconstructed into 3 rects.
         """ """
-
         pos = self.get_pos()
         self_right = pos[0] + self.sizex
         self_left  = pos[0]# - self.sizex
+        self_top    = pos[1]
+        self_bottom = pos[1] + self.sizey
 
         goal_left  = goal.get_left_rect()
         goal_right = goal.get_right_rect()
+        goal_back = goal.get_back_rect()
 
-        line_left  = goal_left.left
-        line_right = goal_left.right
-
-        safety_dist = abs(self.vel[0] * 2) #self.sizex * 0.5
-
-        if self.rect.colliderect(goal_left):
-            self.vel[0] = - self.vel[0]
-            if diff(self_right, line_left) < diff(self_left, line_right):
-                pos[0] = line_left  - (self.sizex + safety_dist)
+        if self.rect.colliderect(goal_back):
+            line_top    = goal_back.top
+            line_bottom = goal_back.bottom
+            safety_dist = abs(self.vel[1]) + self.sizey * 0.3
+            self.vel[1] = - self.vel[1]
+            if diff(self_top, line_bottom) < diff(self_bottom, line_top):
+                pos[1] = line_top + (safety_dist)
             else:
-                pos[0] = line_right + (safety_dist)
+                pos[1] = line_bottom - (self.sizey + safety_dist)
+        else:
+            line_left  = goal_left.left
+            line_right = goal_left.right
+            safety_dist = abs(self.vel[0] * 2)
+            if self.rect.colliderect(goal_left):
+                self.vel[0] = - self.vel[0]
+                if diff(self_right, line_left) < diff(self_left, line_right):
+                    pos[0] = line_left  - (self.sizex + safety_dist)
+                else:
+                    pos[0] = line_right + (safety_dist)
 
-        line_left  = goal_right.left
-        line_right = goal_right.right
+            line_left  = goal_right.left
+            line_right = goal_right.right
 
-        if self.rect.colliderect(goal_right):
-            print 1
-            self.vel[0] = - self.vel[0]
-            if diff(self_right, line_left) < diff(self_left, line_right):
-                pos[0] = line_left -  (self.sizex + safety_dist)
-            else:
-                pos[0] = line_right + (safety_dist)
+            if self.rect.colliderect(goal_right):
+                self.vel[0] = - self.vel[0]
+                if diff(self_right, line_left) < diff(self_left, line_right):
+                    pos[0] = line_left -  (self.sizex + safety_dist)
+                else:
+                    pos[0] = line_right + (safety_dist)
+
 
         self.set_pos(pos)
         return
@@ -218,10 +189,6 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         dist = distance ( [kicker_pos[0]+ kicker.sizex/2, kicker_pos[1]+kicker.sizey/2], \
                           [pos[0]+self.sizex/2, pos[1]+self.sizey/2] )
         user_touch_dist = kicker.sizex/2 + self.sizex/2
-        #if self.collidingHorizontallyLeft  (line_top=kicker.pos[1],  line_bottom=kicker.pos[1]+kicker.sizey, line_x=kicker.pos[0]) \
-        #or self.collidingHorizontallyRight (line_top=kicker.pos[1],  line_bottom=kicker.pos[1]+kicker.sizey, line_x=kicker.pos[0]+kicker_size[1]) \
-        #or self.collidingVerticallyTop     (line_left=kicker.pos[0], line_right=kicker.pos[0]+kicker.sizex,  line_y=kicker.pos[0]) \
-        #or self.collidingVerticallyBottom  (line_left=kicker.pos[0], line_right=kicker.pos[0]+kicker.sizex,  line_y=kicker.pos[0]+kicker_size[0]):
         if dist < user_touch_dist:
             self.is_under_player = True
             self.vel[0] = 2 * (self.vel[0] * (self.mass - kicker.mass) + 2 * kicker.mass * kicker.vel[0]) / (self.mass + kicker.mass)
@@ -259,7 +226,11 @@ class BallBody(GeneralMovingBody):
         self.clockwise_spin = False
         self.radius = radius
         
-        self.initial_pos = [width/2.0,height/2.0]
+        rand = 20
+        self.initial_pos = [
+                width/2.0   + random.random()*rand*2 - rand,
+                height/2.0  + random.random()*rand*2-rand
+                ]
         self.set_pos(self.initial_pos)
         self.vel = [0,0]
 

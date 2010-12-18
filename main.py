@@ -193,10 +193,10 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                 players[1].fire_acc += 0.01
                 if showing: field.setMessage1()
 
+            ball.move(counter,cameraPos=cameraPos)
             if showing:
                 field.blitField(width=width, height=height, surface=surface, cameraPos=cameraPos)
 
-            ball.move(counter,cameraPos=cameraPos)
 
         if debug: pygame.draw.rect(surface, pygame.Color(0,0,0), (0,0, visible_width,visible_height),1)
         if showing:pygame.display.flip()
