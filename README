@@ -4,3 +4,11 @@ the classic Amiga game Sensible Soccer.
 Requires PyGame.
 To run:
     $ python start.py
+
+Keys:
+    -----------------------------------------------------
+    What              Player 1              Player 2
+    -----------------------------------------------------
+    Move the player   up/down/left/right    a/s/d/w
+    Kick the ball     . (period)            ` (backquote)
+    -/=               Zoom in and out
