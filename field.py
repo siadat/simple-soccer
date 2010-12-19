@@ -23,6 +23,10 @@ class Field():
         """ Get field. """
         return self.__grass_field
 
+    def setField(self, field):
+        """ Get field. """
+        self.__grass_field = field
+
     def getGoal1(self):
         """ Get goal 1. """
         return self.__goal1
@@ -50,26 +54,29 @@ class Field():
         surface.blit(self.__message1,(0,0))
         surface.blit(self.__message2,(0,50))
 
-        goal1_pos = [self.__goal1.rect.left - cameraPos[0], self.__goal1.rect.top - cameraPos[1]]
-        goal2_pos = [self.__goal2.rect.left - cameraPos[0], self.__goal2.rect.top - cameraPos[1]]
+        goal1_pos = Array(self.__goal1.rect.topleft) - cameraPos
+        goal2_pos = Array(self.__goal2.rect.topleft) - cameraPos
+
         global_zoom = general.global_zoom
         image1 = self.__goal1.image
         image2 = self.__goal2.image
+
         if global_zoom != 1:
-            goal1_pos = [goal1_pos[0] * global_zoom, goal1_pos[1] * global_zoom]
-            goal2_pos = [goal2_pos[0] * global_zoom, goal2_pos[1] * global_zoom]
+            goal1_pos = Array(goal1_pos) * global_zoom
+            goal2_pos = Array(goal2_pos) * global_zoom
+
             goal1_size = self.__goal1.image.get_size()
             goal2_size = self.__goal2.image.get_size()
-            image1 = pygame.transform.scale(image1, (int(goal1_size[0]*global_zoom), int(goal1_size[1]*global_zoom)))
-            image2 = pygame.transform.scale(image2, (int(goal2_size[0]*global_zoom), int(goal2_size[1]*global_zoom)))
+            image1 = pygame.transform.scale(image1, (Array(goal1_size) * global_zoom).int())
+            image2 = pygame.transform.scale(image2, (Array(goal2_size) * global_zoom).int())
 
         surface.blit(image1, goal1_pos)
         surface.blit(image2, goal2_pos)
 
     def blitBackground(self, surface):
         """ Blit the background field. """
-        self.__grass_field = pygame.transform.smoothscale(self.__grass_field,
-                (int(self.__grass_size[0] * general.global_zoom), int(self.__grass_size[1] * general.global_zoom)) )
+        self.setField(pygame.transform.smoothscale(self.getField(),
+                (int(self.__grass_size[0] * general.global_zoom), int(self.__grass_size[1] * general.global_zoom)) ))
 
         nbrHor = int (math.ceil(width * general.global_zoom / self.getField().get_size()[0]))
         nbrVer = int (math.ceil(height* general.global_zoom / self.getField().get_size()[1]))

@@ -141,7 +141,6 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                     new_key = True
             if online: net.updatePlayers(new_key, isClient, socket, players)
 
-        
         for player in players:
             player.collidingGoal(goal1)
             player.collidingGoal(goal2)
@@ -202,7 +201,6 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
             ball.move(counter,cameraPos=cameraPos)
             if showing:
                 field.blitField(width=width, height=height, surface=surface, cameraPos=cameraPos)
-
 
         vis = general.getVisibleSize()
         if debug: pygame.draw.rect(surface, pygame.Color(0,0,0), (0,0, vis[0],vis[1]),1)

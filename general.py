@@ -18,6 +18,46 @@ def getVisibleSize():
     if vis_y > height: vis_y = height
     return [vis_x, vis_y]
 
+class Array(list):
+    ## cool class: maintains chainability
+    def __add__(self, other):
+        if isinstance(other, list):
+            if len(other) != len(self): print "arrays must be the same size"; exit
+            for i in range(len(self)):
+                self[i] += other[i]
+            return self
+        else:
+            return Array([other + x for x in self])
+
+    def __sub__(self, other):
+        if isinstance(other, list):
+            if len(other) != len(self): print "arrays must be the same size"; exit
+            for i in range(len(self)):
+                self[i] -= other[i]
+            return self
+        else:
+            return Array([other - x for x in self])
+
+    def __mul__(self, other):
+        if isinstance(other, list):
+            if len(other) != len(self): print "arrays must be the same size"; exit
+            for i in range(len(self)):
+                self[i] *= other[i]
+            return self
+        else:
+            return Array([other * x for x in self])
+
+    def __div__(self, other):
+        if isinstance(other, list):
+            if len(other) != len(self): print "arrays must be the same size"; exit
+            for i in range(len(self)):
+                self[i] /= other[i]
+            return self
+        else:
+            return Array([other / x for x in self])
+
+    def int(self):
+        return Array([int(x) for x in self])
 
 def hardlimit(value, uplimit, downlimit):
     if downlimit > uplimit:

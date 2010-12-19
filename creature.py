@@ -79,9 +79,9 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         global_zoom = general.global_zoom
         if global_zoom != 1: 
             size = image.get_size()
-            image = pygame.transform.scale(image, [int(size[0]*global_zoom), int(size[1]*global_zoom)])
-            pos = [pos[0] * global_zoom, pos[1] * global_zoom]
-        self.surface.blit(image, (pos[0], pos[1]))
+            image = pygame.transform.scale(image, (Array(size) * global_zoom).int())
+            pos = Array(pos) * global_zoom
+        self.surface.blit(image, pos)
         self.drawCoordinates()
 
     def getCentre(self):
@@ -95,7 +95,7 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         """ """
         pos = self.get_pos()
         self_right = pos[0] + self.sizex
-        self_left  = pos[0]# - self.sizex
+        self_left  = pos[0]
         self_top    = pos[1]
         self_bottom = pos[1] + self.sizey
 
@@ -171,10 +171,8 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
         kicker_pos = kicker.get_pos()
         kicker_centre = kicker.getCentre()
-
-        kicker_centre[0] = kicker_pos[0] + kicker.sizex/2.0
-        kicker_centre[1] = kicker_pos[1] + kicker.sizey/2.0
-        dist = distance ( [kicker_centre[0], kicker_centre[1]] , [pos[0]+self.sizex/2, pos[1]+self.sizey/2] )
+        kicker_centre = Array(kicker_pos) + [kicker.sizex/2.0, kicker.sizey/2.0]
+        dist = distance ( kicker_centre, Array(pos) + [self.sizex/2.0, self.sizey/2.0] )
         user_touch_dist = kicker.sizex/2 + self.sizex/2
         shoot_dist = user_touch_dist + 40
         if dist < shoot_dist:
@@ -196,8 +194,8 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         """ Ball is kicked by the kicker. """
         pos = self.get_pos()
         kicker_pos = kicker.get_pos()
-        dist = distance ( [kicker_pos[0]+ kicker.sizex/2, kicker_pos[1]+kicker.sizey/2], \
-                          [pos[0]+self.sizex/2, pos[1]+self.sizey/2] )
+        dist = distance ( Array(kicker_pos) + [kicker.sizex/2.0, kicker.sizey/2.0], \
+                          Array(pos) + [self.sizex/2, self.sizey/2] )
         user_touch_dist = kicker.sizex/2 + self.sizex/2
         if dist < user_touch_dist:
             self.is_under_player = True
@@ -229,7 +227,6 @@ class BallBody(GeneralMovingBody):
         self.image, self.rect = load_image('ball.bmp', self.scale, -1)
         self.original = self.image
         
-
         self.reset()
         self.move_turn = math.floor(random.random()*100)
         self.is_contact = False
@@ -269,10 +266,6 @@ class BallBody(GeneralMovingBody):
         else:
             rotate = pygame.transform.rotate
             self.image = rotate(self.original, self.angle)
-        #scale = math.sqrt(self.vel[0] ** 2 + self.vel[1] ** 2)/20 + 1
-        #self.sizex = self.scale[0] * scale
-        #self.sizey = self.scale[1] * scale
-        #self.image = pygame.transform.scale(self.image, (self.sizex, self.sizey) )
         self.rect = self.image.get_rect(center=center)
 
         
@@ -282,9 +275,6 @@ class BallBody(GeneralMovingBody):
         for i in range(0,2):
             if self.vel[i] <= 0.001 and self.vel[i] >= -0.001:
                 self.vel[i] = 0
-                #self.sizex = self.scale[0]
-                #self.sizey = self.scale[1]
-                #self.image = pygame.transform.scale(self.image, self.scale)
             if self.vel[i] > 0.1 or self.vel[i] < -0.1:
                 self.rot_center(abs(self.vel[i])*4);
 
@@ -363,31 +353,31 @@ class CreatureBody(GeneralMovingBody):
             # marker will always be visible (limited to visible area from camera)
             pos[0] = general.hardlimit(pos[0], cameraPos[0], cameraPos[0] + vis[0] - self.sizex)
             topleft = [pos[0]+self.sizex/2.0 - field.getBarWidth()/2.0 - cameraPos[0], 0]
-            topleft = [topleft[0]*general.global_zoom, topleft[1]*general.global_zoom]
+            topleft = Array(topleft) * general.global_zoom
+
             size    = [field.getBarWidth(), 10]
             rect = pygame.Rect(topleft, size)
             pygame.draw.rect(surface, self.color, rect)
         elif pos[1] > cameraPos[1] + vis[1]:
             pos[0] = general.hardlimit(pos[0], cameraPos[0], cameraPos[0] + vis[0] - self.sizex)
             topleft = [pos[0]+self.sizex/2.0 - field.getBarWidth()/2.0 - cameraPos[0], vis[1]]
-            topleft = [topleft[0]*general.global_zoom, topleft[1]*general.global_zoom]
+            topleft = Array(topleft) * general.global_zoom
             size    = [field.getBarWidth(),-10]
             rect = pygame.Rect(topleft, size)
             pygame.draw.rect(surface, self.color, rect)
-
         # because pos was overwritten, get it again:
         pos = self.get_pos()
         if pos[0] + self.sizex < cameraPos[0]:
             pos[1] = general.hardlimit(pos[1], cameraPos[1], cameraPos[1] + vis[1] - self.sizey)
             topleft = [0, pos[1]+self.sizey/2.0 - field.getBarWidth()/2.0 -cameraPos[1]]
-            topleft = [topleft[0]*general.global_zoom, topleft[1]*general.global_zoom]
+            topleft = Array(topleft) * general.global_zoom
             size = [10, field.getBarWidth()]
             rect = pygame.Rect(topleft, size)
             pygame.draw.rect(surface, self.color, rect)
         elif pos[0] > cameraPos[0] + vis[0]:
             pos[1] = general.hardlimit(pos[1], cameraPos[1], cameraPos[1] + vis[1] - self.sizey)
             topleft = [vis[0], pos[1]+self.sizey/2.0 - field.getBarWidth()/2.0 -cameraPos[1]]
-            topleft = [topleft[0]*general.global_zoom, topleft[1]*general.global_zoom]
+            topleft = Array(topleft) * general.global_zoom
             size = [-10, field.getBarWidth()]
             rect = pygame.Rect(topleft, size)
             pygame.draw.rect(surface, self.color, rect)
