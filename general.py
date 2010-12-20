@@ -105,6 +105,21 @@ def drawLine(surface, color, startPos, endPos):
     endPos[1] = (endPos[1] - cameraPos[1]) * global_zoom
     pygame.draw.line( surface, color, startPos, endPos)
 
+def drawCircle(surface, color, centrePos, radius, width=1):
+    """ Draw a line given the end points, a color and a surface. """
+    centrePos[0] = (centrePos[0] - cameraPos[0]) * global_zoom
+    centrePos[1] = (centrePos[1] - cameraPos[1]) * global_zoom
+    radius = radius * global_zoom
+    pygame.draw.circle( surface, color, centrePos, radius, width)
+
+def drawRect(surface, color, startPos, endPos):
+    """ Draw a line given the end points, a color and a surface. """
+    startPos[0] = (startPos[0] - cameraPos[0]) * global_zoom
+    startPos[1] = (startPos[1] - cameraPos[1]) * global_zoom
+    endPos[0] = (endPos[0] - cameraPos[0]) * global_zoom
+    endPos[1] = (endPos[1] - cameraPos[1]) * global_zoom
+    pygame.draw.rect( surface, color, pygame.Rect(startPos[0], startPos[1], endPos[0]-startPos[0], endPos[1]-startPos[1]))
+
 def moveCamera(ball):
     """ Move the camera relative to the ball's position and vel and acc. """
     pos = ball.getCentre()

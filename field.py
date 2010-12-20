@@ -86,6 +86,11 @@ class Field():
                     i * self.getField().get_size()[0]-cameraPos[0]*general.global_zoom,
                     j * self.getField().get_size()[1]-cameraPos[1]*general.global_zoom))
 
+        line_color = pygame.Color(240,250,220)
+        drawRect  (surface, line_color, [0, height/2.0-1], [width, height/2.0+1])
+        drawCircle(surface, line_color, [width/2.0, height/2.0], 80)
+        drawCircle(surface, line_color, [width/2.0, height/2.0], 4,0)
+
 class Goal(pygame.sprite.Sprite):
     """ The class for the goal."""
     def __init__(self, direction):

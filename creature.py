@@ -46,7 +46,7 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         ## There's no self.pos. See set_pos() and get_pos()
         self._float_pos = [0, 0]
 
-        self.initial_pos = [width/2.0, height/2.0]
+        self.initial_centre_pos = [width/2.0, height/2.0]
         self.showing = showing
 
         self.stoppingx = False
@@ -69,7 +69,7 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         return [self._float_pos[0], self._float_pos[1]]
 
     def reset(self):
-        self.set_pos(self.initial_pos)
+        self.set_pos([self.initial_centre_pos[0] - self.sizex/2.0, self.initial_centre_pos[1] - self.sizey/2.0])
         self.vel = [0,0]
         self.acc = [0,0]
 
@@ -230,18 +230,17 @@ class BallBody(GeneralMovingBody):
         self.image, self.rect = load_image('ball.bmp', self.scale, -1)
         self.original = self.image
         
-        self.reset()
         self.move_turn = math.floor(random.random()*100)
         self.is_contact = False
         self.clockwise_spin = False
         self.radius = radius
         
         rand = 0
-        self.initial_pos = [
-                width/2.0   + random.random()*rand*2 - rand - self.sizex/2.0,
-                height/2.0  + random.random()*rand*2 - rand - self.sizey/2.0
+        self.initial_centre_pos = [
+                width/2.0   + random.random()*rand*2 - rand,
+                height/2.0  + random.random()*rand*2 - rand
                 ]
-        self.set_pos(self.initial_pos)
+        self.reset()
         self.vel = [0,0]
 
     def move(self, time, cameraPos, target=None):
@@ -332,7 +331,7 @@ class CreatureBody(GeneralMovingBody):
         self.guy_left_running1 = pygame.transform.flip(self.guy_right_running1, True, False)
         self.guy_left_running2 = pygame.transform.flip(self.guy_right_running2, True, False)
 
-        self.initial_pos = [width/2.0, height/3.0 * type]
+        self.initial_centre_pos = [width/2.0, height/3.0 * type]
         self.reset()
 
         self.move_turn = math.floor(random.random()*100)
@@ -474,7 +473,7 @@ class CreatureBodyComputer(CreatureBody):
         self.guy_left_running2 = pygame.transform.flip(self.guy_right_running2, True, False)
 
 
-        self.initial_pos = [width/2.0, height/3.0 * self.type]
+        self.initial_centre_pos = [width/2.0, height/3.0 * self.type]
         self.reset()
 
         self.move_turn = math.floor(random.random()*100)
