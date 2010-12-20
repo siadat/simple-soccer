@@ -236,10 +236,10 @@ class BallBody(GeneralMovingBody):
         self.clockwise_spin = False
         self.radius = radius
         
-        rand = 20
+        rand = 0
         self.initial_pos = [
-                width/2.0   + random.random()*rand*2 - rand,
-                height/2.0  + random.random()*rand*2-rand
+                width/2.0   + random.random()*rand*2 - rand - self.sizex/2.0,
+                height/2.0  + random.random()*rand*2 - rand - self.sizey/2.0
                 ]
         self.set_pos(self.initial_pos)
         self.vel = [0,0]
