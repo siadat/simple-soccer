@@ -10,6 +10,7 @@ visible_height = height - 100
 cameraPos = [0, 0]
 global_zoom = 1
 debug = not not False
+PI = 3.1415
 
 def getVisibleSize():
     vis_x = visible_width  / global_zoom

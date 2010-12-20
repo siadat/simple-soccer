@@ -40,6 +40,8 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         self.scale = (self.sizex, self.sizey)
         self.surface = surface
 
+        self.time_sum = 0
+
         self.limitx = width  - self.sizex
         self.limity = height - self.sizey
 
@@ -277,19 +279,9 @@ class BallBody(GeneralMovingBody):
         limit = [self.limitx, self.limity]
         pos = self.get_pos()
         for i in range(0,2):
-            if self.vel[i] <= 0.001 and self.vel[i] >= -0.001:
+            self.vel[i] += - self.vel[i]/70.0
+            if self.vel[i] <= 0.01 and self.vel[i] >= -0.01:
                 self.vel[i] = 0
-            if self.vel[i] > 0.1 or self.vel[i] < -0.1:
-                self.rot_center(abs(self.vel[i])*4);
-
-            if self.vel[i] > 0: ff = -0.01
-            elif self.vel[i] < 0: ff =  0.01
-            else: ff = 0
-
-            self.vel[i] += - self.vel[i]/100.0 + ff
-            if self.vel[i] <= 0.001 and self.vel[i] >= -0.001:
-                self.vel[i] = 0
-
             if pos[i] > limit[i]:
                 pos[i] = limit[i]
                 self.vel[i] = -self.vel[i] * 4.0/5.0
@@ -298,6 +290,11 @@ class BallBody(GeneralMovingBody):
                 self.vel[i] = -self.vel[i] * 4.0/5.0
 
             pos[i] = pos[i] + self.vel[i]
+
+        vel_size = math.sqrt(self.vel[0]**2 + self.vel[1]**2)
+        if vel_size > 0.1:
+            self.rot_center(vel_size*4);
+
         self.set_pos(pos)
 
 
@@ -308,6 +305,8 @@ class CreatureBody(GeneralMovingBody):
     """ Everything a player needs to know."""
     def __init__(self, surface, size, type=1, showing=True):
         GeneralMovingBody.__init__(self,surface=surface,size=size,showing=True)
+        
+        self.vel_threshold = 1.2
 
         if type==1:
             name = 'guy_'
@@ -349,7 +348,7 @@ class CreatureBody(GeneralMovingBody):
             self.vel[1] += - self.vel[1]/15.0
             self.acc[1] = 0
         self.__newpos()
-        if self.showing: self.__walk(time, cameraPos)
+        if self.showing: self.__walk(cameraPos)
         """ draw indicators if player is outside visible area """
         pos = self.get_pos()
         vis = general.getVisibleSize()
@@ -386,20 +385,25 @@ class CreatureBody(GeneralMovingBody):
             rect = pygame.Rect(topleft, size)
             pygame.draw.rect(surface, self.color, rect)
 
-    def __walk(self, time, cameraPos):
+    def __walk(self, cameraPos):
         """ Render (blit) approprate image depending on direction the player is facing. """
-        gate_frequency = 50
+        vel_size = math.sqrt(self.vel[0]**2 + self.vel[1]**2)
+        max_size = math.sqrt((self.vel_threshold ** 2) * 2)
+        gate_frequency = (1.0*vel_size/max_size) * 20 + 1
+        self.time_sum = self.time_sum + 1 * gate_frequency
+        sin = math.sin((self.time_sum)/180.0 * PI)
+
         if abs(self.vel[1]) > abs(self.vel[0]):
             """ Vertical vel is higher: """
             if self.vel[1] > 0:
                 self.standing_direction = 'front'
-                if time % gate_frequency > gate_frequency/2.0:
+                if sin > 0:
                     self.renderImage(self.guy_front_running2, cameraPos)
                 else:
                     self.renderImage(self.guy_front_running1, cameraPos)
             else:
                 self.standing_direction = 'back'
-                if time % gate_frequency > gate_frequency/2.0:
+                if sin > 0:
                     self.renderImage(self.guy_back_running2, cameraPos)
                 else:
                     self.renderImage(self.guy_back_running1, cameraPos)
@@ -407,13 +411,13 @@ class CreatureBody(GeneralMovingBody):
             """ Horizontal vel is higher: """
             if self.vel[0] > 0:
                 self.standing_direction = 'right'
-                if time % gate_frequency > gate_frequency/2.0:
+                if sin > 0:
                     self.renderImage(self.guy_right_running2, cameraPos)
                 else:
                     self.renderImage(self.guy_right_running1, cameraPos)
             else:
                 self.standing_direction = 'left'
-                if time % gate_frequency > gate_frequency/2.0:
+                if sin > 0:
                     self.renderImage(self.guy_left_running2, cameraPos)
                 else:
                     self.renderImage(self.guy_left_running1, cameraPos)
@@ -436,7 +440,6 @@ class CreatureBody(GeneralMovingBody):
             self.vel[i] = self.vel[i] + self.acc[i]
             if self.vel[i] <= 0.001 and self.vel[i] >= -0.001:
                 self.vel[i] = 0
-            self.vel_threshold = 1.2
             if   self.vel[i] >  self.vel_threshold: self.vel[i] =  self.vel_threshold
             elif self.vel[i] < -self.vel_threshold: self.vel[i] = -self.vel_threshold
 
