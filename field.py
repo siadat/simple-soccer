@@ -116,6 +116,6 @@ class Goal(pygame.sprite.Sprite):
         sizex = self.image.get_size()[0]
 
         if self.direction == 'up':
-            return pygame.Rect(l, b - 5, sizex, 5)
+            return pygame.Rect(l+5, b - 5, sizex-5*2, 5)
         else:
-            return pygame.Rect(l, t, sizex, 5)
+            return pygame.Rect(l+5, t, sizex-5*2, 5)

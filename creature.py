@@ -112,30 +112,33 @@ class GeneralMovingBody(pygame.sprite.Sprite):
                 pos[1] = line_top + (safety_dist)
             else:
                 pos[1] = line_bottom - (self.sizey + safety_dist)
-        else:
+            self.set_pos(pos)
+            return
+
+        safety_dist = abs(self.vel[0] * 2)
+        if self.rect.colliderect(goal_left):
             line_left  = goal_left.left
             line_right = goal_left.right
-            safety_dist = abs(self.vel[0] * 2)
-            if self.rect.colliderect(goal_left):
-                self.vel[0] = - self.vel[0]
-                if diff(self_right, line_left) < diff(self_left, line_right):
-                    pos[0] = line_left  - (self.sizex + safety_dist)
-                else:
-                    pos[0] = line_right + (safety_dist)
+            self.vel[0] = - self.vel[0]
+            if diff(self_right, line_left) < diff(self_left, line_right):
+                pos[0] = line_left  - (self.sizex + safety_dist)
+            else:
+                pos[0] = line_right + (safety_dist)
+            self.set_pos(pos)
+            return
 
+        if self.rect.colliderect(goal_right):
             line_left  = goal_right.left
             line_right = goal_right.right
+            self.vel[0] = - self.vel[0]
+            if diff(self_right, line_left) < diff(self_left, line_right):
+                pos[0] = line_left -  (self.sizex + safety_dist)
+            else:
+                pos[0] = line_right + (safety_dist)
+            self.set_pos(pos)
+            return
 
-            if self.rect.colliderect(goal_right):
-                self.vel[0] = - self.vel[0]
-                if diff(self_right, line_left) < diff(self_left, line_right):
-                    pos[0] = line_left -  (self.sizex + safety_dist)
-                else:
-                    pos[0] = line_right + (safety_dist)
 
-
-        self.set_pos(pos)
-        return
 
     def fireLeft(self):
         """ Accelerate to the left. """
