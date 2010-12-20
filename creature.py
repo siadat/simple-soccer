@@ -23,8 +23,10 @@ class Keyboard():
     def isEquals(self): return self.__pygame_event.key == pygame.K_EQUALS;
     def isMinus(self): return self.__pygame_event.key == pygame.K_MINUS;
     def isPeriod(self): return self.__pygame_event.key == pygame.K_PERIOD;
+    def isSlash(self): return self.__pygame_event.key == pygame.K_SLASH;
     def isComma(self): return self.__pygame_event.key == pygame.K_COMMA;
     def isBackquote(self): return self.__pygame_event.key == pygame.K_BACKQUOTE;
+    def isOne(self): return self.__pygame_event.key == pygame.K_1;
     def isEscape(self): return self.__pygame_event.key == pygame.K_ESCAPE;
 # }}}
 # {{{ GeneralMovingBody 
@@ -168,7 +170,7 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         """ Stop accelerating vertically. """
         self.stoppingy = True
 
-    def getShooted(self, kicker):
+    def getShooted(self, kicker, power=1):
         """ Ball is shooted by kicker. """
         pos = self.get_pos()
 
@@ -182,8 +184,8 @@ class GeneralMovingBody(pygame.sprite.Sprite):
             new_vel_0 = 2 * (self.vel[0] * (self.mass - kicker.mass) + 2 * kicker.mass * (pos[0]+self.sizex/2 - kicker_centre[0]) ) / (self.mass + kicker.mass)
             new_vel_1 = 2 * (self.vel[1] * (self.mass - kicker.mass) + 2 * kicker.mass * (pos[1]+self.sizey/2 - kicker_centre[1]) ) / (self.mass + kicker.mass)
             new_vel_size = math.sqrt( new_vel_0 ** 2 + new_vel_1 ** 2 )
-            new_vel_0 = 200 * (new_vel_0 / new_vel_size) / dist
-            new_vel_1 = 200 * (new_vel_1 / new_vel_size) / dist
+            new_vel_0 = power * 300 * (new_vel_0 / new_vel_size) / dist
+            new_vel_1 = power * 300 * (new_vel_1 / new_vel_size) / dist
             self.vel[0] = new_vel_0
             self.vel[1] = new_vel_1
             self.clockwise_spin = not self.clockwise_spin 

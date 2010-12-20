@@ -10,5 +10,6 @@ Keys:
     What              Player 1              Player 2
     -----------------------------------------------------
     Move the player   up/down/left/right    a/s/d/w
-    Kick the ball     . (period)            ` (backquote)
+    Hard kick         . (period)            ` (backquote)
+    Soft kick         / (slash)             1
     -/=               Zoom in and out

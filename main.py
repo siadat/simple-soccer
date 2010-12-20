@@ -115,6 +115,8 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                         players[0].fireDown()
                     elif whatkey.isPeriod():
                         balls[0].getShooted(players[0])
+                    elif whatkey.isSlash():
+                        balls[0].getShooted(players[0], 0.66)
                     elif whatkey.isA():
                         players[1].fireLeft()
                     elif whatkey.isD():
@@ -125,6 +127,8 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                         players[1].fireDown()
                     elif whatkey.isBackquote():
                         balls[0].getShooted(players[1])
+                    elif whatkey.isOne():
+                        balls[0].getShooted(players[1], 0.66)
                 elif whatkey.isKEYUP():
                     if whatkey.isLeft() or whatkey.isRight():
                         players[0].stopLeftAndRight()
