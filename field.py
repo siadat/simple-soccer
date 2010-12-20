@@ -87,9 +87,18 @@ class Field():
                     j * self.getField().get_size()[1]-cameraPos[1]*general.global_zoom))
 
         line_color = pygame.Color(240,250,220)
+        ## centre line
         drawRect  (surface, line_color, [0, height/2.0-1], [width, height/2.0+1])
+        ## big circle in the middle
         drawCircle(surface, line_color, [width/2.0, height/2.0], 80)
+        ## small circle where ball is
         drawCircle(surface, line_color, [width/2.0, height/2.0], 4,0)
+        ## line behind goal 1
+        goal1_pos = [self.getGoal1().rect.left, self.getGoal1().rect.top]
+        drawRect  (surface, line_color, [0, goal1_pos[1]], [width, goal1_pos[1]])
+        ## line behind goal 2
+        goal2_pos = [self.getGoal2().rect.left, self.getGoal2().rect.bottom]
+        drawRect  (surface, line_color, [0, goal2_pos[1]], [width, goal2_pos[1]])
 
 class Goal(pygame.sprite.Sprite):
     """ The class for the goal."""
