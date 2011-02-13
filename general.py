@@ -1,16 +1,19 @@
 import pygame, sys, os
 from pygame.locals import *
 import math
+import copy
 
 """ Public variables: """
+surface = None
 width  = 200.0 * 3
 height = 200.0 * 4
-visible_width = width - 100
+visible_width  = width - 100
 visible_height = height - 100
 cameraPos = [0, 0]
 global_zoom = 1
 debug = not not False
 PI = 3.1415
+PLAYER_VEL_LIMIT = 1.2
 
 def getVisibleSize():
     vis_x = visible_width  / global_zoom
@@ -100,6 +103,8 @@ def diff(value1, value2):
 
 def drawLine(surface, color, startPos, endPos):
     """ Draw a line given the end points, a color and a surface. """
+    startPos = copy.copy(startPos)
+    endPos = copy.copy(endPos)
     startPos[0] = (startPos[0] - cameraPos[0]) * global_zoom
     startPos[1] = (startPos[1] - cameraPos[1]) * global_zoom
     endPos[0] = (endPos[0] - cameraPos[0]) * global_zoom
@@ -108,13 +113,16 @@ def drawLine(surface, color, startPos, endPos):
 
 def drawCircle(surface, color, centrePos, radius, width=1):
     """ Draw a line given the end points, a color and a surface. """
-    centrePos[0] = (centrePos[0] - cameraPos[0]) * global_zoom
-    centrePos[1] = (centrePos[1] - cameraPos[1]) * global_zoom
-    radius = radius * global_zoom
+    centrePos = copy.copy(centrePos)
+    centrePos[0] = int((centrePos[0] - cameraPos[0]) * global_zoom)
+    centrePos[1] = int((centrePos[1] - cameraPos[1]) * global_zoom)
+    radius = int(radius * global_zoom)
     pygame.draw.circle( surface, color, centrePos, radius, width)
 
 def drawRect(surface, color, startPos, endPos):
     """ Draw a line given the end points, a color and a surface. """
+    startPos = copy.copy(startPos)
+    endPos = copy.copy(endPos)
     startPos[0] = (startPos[0] - cameraPos[0]) * global_zoom
     startPos[1] = (startPos[1] - cameraPos[1]) * global_zoom
     endPos[0] = (endPos[0] - cameraPos[0]) * global_zoom

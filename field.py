@@ -1,11 +1,12 @@
 from general import *
 import general
-class Field():
+class Field(pygame.sprite.Sprite):
     """ Methods and properties related to rendering the field, goals, goals and scores. """
     def __init__(self):
-        self.__grass_field, rect = load_image(filepath="grass.jpg");
-        self.__grass_field = self.__grass_field.convert()
-        self.__grass_size = self.__grass_field.get_size()
+        pygame.sprite.Sprite.__init__(self)
+        self.image, self.rect = load_image(filepath="grass.jpg");
+        self.image = self.image.convert()
+        self.__grass_size = self.image.get_size()
 
         self.__goal1 = Goal("down")
         self.__goal2 = Goal("up")
@@ -21,11 +22,11 @@ class Field():
 
     def getField(self):
         """ Get field. """
-        return self.__grass_field
+        return self.image
 
     def setField(self, field):
         """ Get field. """
-        self.__grass_field = field
+        self.image = field
 
     def getGoal1(self):
         """ Get goal 1. """

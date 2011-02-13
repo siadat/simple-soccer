@@ -8,6 +8,7 @@ from creature import *
 #from gp import *
 #from net import *
 from field import *
+import ai
 # }}}
 
 if not pygame.font:  print 'Warning, fonts disabled'
@@ -18,6 +19,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
     number_of_players = 2
     number_of_computer_creatures = 0
     number_of_balls = 1
+
 
     balls = list()
     players = list()
@@ -33,7 +35,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
 
     if showing: pygame.init()
     if showing: os.environ['SDL_VIDEO_CENTERED'] = '1'
-    if showing: pygame.mouse.set_visible(False)
+    #if showing: pygame.mouse.set_visible(False)
     
     if showing:
         vis = general.getVisibleSize()
@@ -43,20 +45,25 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
     
     fitness1 = 0
     fitness2 = 0
-    surface = None
+
     if showing:
         pygame.display.set_caption('Genetic Soccer')
-        surface = pygame.display.get_surface()
+        general.surface = pygame.display.get_surface()
         field = Field();
+        goal1 = field.getGoal1()
+        goal2 = field.getGoal2()
 
     for i in range(0,number_of_balls):
-        balls.append(BallBody(surface=surface, radius=6, showing=showing))
+        balls.append(BallBody(surface=general.surface, radius=6, showing=showing))
 
     for i in range(0,number_of_players):
-        players.append( CreatureBody(surface,(20,20),i+1, showing) )
+        players.append( CreatureBody(general.surface,(20,20),number_of_players-i, showing) )
 
     for i in range(0,number_of_computer_creatures):
-        computer_creature.append( CreatureBodyComputer( surface=surface ) )
+        computer_creature.append( CreatureBodyComputer( surface=general.surface ) )
+    
+    ai_state = ai.State(players[0], players[1], balls[0])
+    my_ai = ai.Ai(players[1], goal1, goal2)
 
     if showing: clock = pygame.time.Clock()
 
@@ -69,8 +76,6 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
         stoppingy_event = False
         new_key = False
         mouse_pos = pygame.mouse.get_pos()
-        goal1 = field.getGoal1()
-        goal2 = field.getGoal2()
         goal_size = goal1.image.get_size()
 
         if online:
@@ -93,7 +98,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
 
         if showing:
             """ Background """
-            if showing: field.blitBackground(surface)
+            if showing: field.blitBackground(general.surface)
             """ Keyboard events """
             input = pygame.event.get()
             for event in input:
@@ -116,7 +121,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                     elif whatkey.isPeriod():
                         balls[0].getShooted(players[0])
                     elif whatkey.isSlash():
-                        balls[0].getShooted(players[0], 0.66)
+                        balls[0].getShooted(players[0], 0.46)
                     elif whatkey.isA():
                         players[1].fireLeft()
                     elif whatkey.isD():
@@ -128,7 +133,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                     elif whatkey.isBackquote():
                         balls[0].getShooted(players[1])
                     elif whatkey.isOne():
-                        balls[0].getShooted(players[1], 0.66)
+                        balls[0].getShooted(players[1], 0.46)
                 elif whatkey.isKEYUP():
                     if whatkey.isLeft() or whatkey.isRight():
                         players[0].stopLeftAndRight()
@@ -145,10 +150,12 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                     new_key = True
             if online: net.updatePlayers(new_key, isClient, socket, players)
 
+        ai_state.update()
+        my_ai.do(ai_state)
         for player in players:
             player.collidingGoal(goal1)
             player.collidingGoal(goal2)
-            player.move(surface, field, counter, cameraPos=cameraPos, goal_size=goal_size)
+            player.move(general.surface, field, counter, cameraPos=cameraPos, goal_size=goal_size)
 
         for ball in balls:
             """ All balls """
@@ -169,7 +176,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                 if debug:
                     print mouse_pos
                 cc.acc = [ (random.random()-0.5)/5.0, (random.random()-0.5)/5.0]
-                cc.move(surface, field, counter, cameraPos=cameraPos, goal_size=goal_size)
+                cc.move(general.surface, field, counter, cameraPos=cameraPos, goal_size=goal_size)
 
             # to the pipe (tirake darvaze):
             is_colliding_goal_pipe_top_right    = ( ball.vel[1] < 0 and (diff(ball_centre[1], goal_size[1]) < ball.radius)            and (diff(ball_centre[0], (width/2 + goal_size[0]/2)) < 3) )
@@ -204,9 +211,9 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
 
             ball.move(counter,cameraPos=cameraPos)
             if showing:
-                field.blitField(width=width, height=height, surface=surface, cameraPos=cameraPos)
+                field.blitField(width=width, height=height, surface=general.surface, cameraPos=cameraPos)
 
         vis = general.getVisibleSize()
-        if debug: pygame.draw.rect(surface, pygame.Color(0,0,0), (0,0, vis[0],vis[1]),1)
+        if debug: pygame.draw.rect(general.surface, pygame.Color(0,0,0), (0,0, vis[0],vis[1]),1)
         if showing:pygame.display.flip()
     return (1.0 * fitness1/counter, 1.0 * fitness2/counter)

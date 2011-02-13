@@ -44,6 +44,7 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
         self.limitx = width  - self.sizex
         self.limity = height - self.sizey
+        self.vel_threshold = PLAYER_VEL_LIMIT
 
         self.vel = [0, 0]
         self.acc = [0, 0]
@@ -71,6 +72,9 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
     def get_pos(self):
         return [self._float_pos[0], self._float_pos[1]]
+
+    def get_centre_pos(self):
+        return [self._float_pos[0] + self.sizex/2.0, self._float_pos[1] + self.sizey/2.0]
 
     def reset(self):
         self.set_pos([self.initial_centre_pos[0] - self.sizex/2.0, self.initial_centre_pos[1] - self.sizey/2.0])
@@ -186,8 +190,8 @@ class GeneralMovingBody(pygame.sprite.Sprite):
             new_vel_0 = 2 * (self.vel[0] * (self.mass - kicker.mass) + 2 * kicker.mass * (pos[0]+self.sizex/2 - kicker_centre[0]) ) / (self.mass + kicker.mass)
             new_vel_1 = 2 * (self.vel[1] * (self.mass - kicker.mass) + 2 * kicker.mass * (pos[1]+self.sizey/2 - kicker_centre[1]) ) / (self.mass + kicker.mass)
             new_vel_size = math.sqrt( new_vel_0 ** 2 + new_vel_1 ** 2 )
-            new_vel_0 = power * 300 * (new_vel_0 / new_vel_size) / dist
-            new_vel_1 = power * 300 * (new_vel_1 / new_vel_size) / dist
+            new_vel_0 = power * 200 * (new_vel_0 / new_vel_size) / dist
+            new_vel_1 = power * 200 * (new_vel_1 / new_vel_size) / dist
             self.vel[0] = new_vel_0
             self.vel[1] = new_vel_1
             self.clockwise_spin = not self.clockwise_spin 
@@ -248,6 +252,7 @@ class BallBody(GeneralMovingBody):
         self.vel = [0,0]
 
     def move(self, time, cameraPos, target=None):
+        """ Move the ball. """
         self.__time = time
         self.__newpos()
         if self.showing: self.renderImage(self.image, cameraPos)
@@ -274,8 +279,8 @@ class BallBody(GeneralMovingBody):
             self.image = rotate(self.original, self.angle)
         self.rect = self.image.get_rect(center=center)
 
-        
     def __newpos(self):
+        """ Update ball's position. """
         limit = [self.limitx, self.limity]
         pos = self.get_pos()
         for i in range(0,2):
@@ -298,7 +303,6 @@ class BallBody(GeneralMovingBody):
         self.set_pos(pos)
 
 
-
 # }}}
 # {{{ CreatureBody
 class CreatureBody(GeneralMovingBody):
@@ -306,7 +310,7 @@ class CreatureBody(GeneralMovingBody):
     def __init__(self, surface, size, type=1, showing=True):
         GeneralMovingBody.__init__(self,surface=surface,size=size,showing=True)
         
-        self.vel_threshold = 1.2
+        self.relax = random.random() # 0 = sleep, 1 = desperate
 
         if type==1:
             name = 'guy_'
@@ -340,6 +344,7 @@ class CreatureBody(GeneralMovingBody):
         self.standing_direction = 'front'
 
     def move(self, surface, field, time, cameraPos, goal_size):
+        """ Move the player. """
         """ stopping the player, if keyup """
         if self.stoppingx:
             self.vel[0] += - self.vel[0]/15.0
@@ -433,7 +438,7 @@ class CreatureBody(GeneralMovingBody):
                 self.renderImage(self.guy_front_standing, cameraPos)
 
     def __newpos(self):
-        """ Update player's position """
+        """ Update player's position. """
         limit = [self.limitx, self.limity]
         pos = self.get_pos()
         for i in range(0,2):
