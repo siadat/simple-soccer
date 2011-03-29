@@ -4,7 +4,8 @@ class Field(pygame.sprite.Sprite):
     """ Methods and properties related to rendering the field, goals, goals and scores. """
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image(filepath="grass.jpg");
+        #self.image, self.rect = load_image(filepath= os.path.dirname(sys.argv[0]) + "grass.jpg");
+        self.image, self.rect = load_image(filepath= "grass.jpg");
         self.image = self.image.convert()
         self.__grass_size = self.image.get_size()
 

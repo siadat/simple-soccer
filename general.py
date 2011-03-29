@@ -77,7 +77,7 @@ def hardlimit(value, uplimit, downlimit):
 
 def load_image(filepath, scale=None, colorkey=None):
     """ Load an image. """
-    fullname = os.path.join('images', filepath)
+    fullname = os.path.join(os.path.dirname(sys.argv[0]), 'images', filepath)
     try:
         image = pygame.image.load(fullname)
         if scale is not None:
