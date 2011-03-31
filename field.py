@@ -82,8 +82,8 @@ class Field(pygame.sprite.Sprite):
 
         nbrHor = int (math.ceil(width * general.global_zoom / self.getField().get_size()[0]))
         nbrVer = int (math.ceil(height* general.global_zoom / self.getField().get_size()[1]))
-        for i in range(0,nbrHor):
-            for j in range(0,nbrVer):
+        for i in xrange(0,nbrHor):
+            for j in xrange(0,nbrVer):
                 surface.blit(self.getField(), (
                     i * self.getField().get_size()[0]-cameraPos[0]*general.global_zoom,
                     j * self.getField().get_size()[1]-cameraPos[1]*general.global_zoom))

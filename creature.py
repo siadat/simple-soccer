@@ -283,7 +283,7 @@ class BallBody(GeneralMovingBody):
         """ Update ball's position. """
         limit = [self.limitx, self.limity]
         pos = self.get_pos()
-        for i in range(0,2):
+        for i in xrange(0,2):
             self.vel[i] += - self.vel[i]/70.0
             if self.vel[i] <= 0.01 and self.vel[i] >= -0.01:
                 self.vel[i] = 0
@@ -441,7 +441,7 @@ class CreatureBody(GeneralMovingBody):
         """ Update player's position. """
         limit = [self.limitx, self.limity]
         pos = self.get_pos()
-        for i in range(0,2):
+        for i in xrange(0,2):
             self.vel[i] = self.vel[i] + self.acc[i]
             if self.vel[i] <= 0.001 and self.vel[i] >= -0.001:
                 self.vel[i] = 0

@@ -53,13 +53,13 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
         goal1 = field.getGoal1()
         goal2 = field.getGoal2()
 
-    for i in range(0,number_of_balls):
+    for i in xrange(0,number_of_balls):
         balls.append(BallBody(surface=general.surface, radius=6, showing=showing))
 
-    for i in range(0,number_of_players):
+    for i in xrange(0,number_of_players):
         players.append( CreatureBody(general.surface,(20,20),number_of_players-i, showing) )
 
-    for i in range(0,number_of_computer_creatures):
+    for i in xrange(0,number_of_computer_creatures):
         computer_creature.append( CreatureBodyComputer( surface=general.surface ) )
     
     ai_state = ai.State(players[0], players[1], balls[0])

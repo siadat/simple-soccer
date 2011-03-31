@@ -27,7 +27,7 @@ class Array(list):
     def __add__(self, other):
         if isinstance(other, list):
             if len(other) != len(self): print "arrays must be the same size"; exit
-            for i in range(len(self)):
+            for i in xrange(len(self)):
                 self[i] += other[i]
             return self
         else:
@@ -36,7 +36,7 @@ class Array(list):
     def __sub__(self, other):
         if isinstance(other, list):
             if len(other) != len(self): print "arrays must be the same size"; exit
-            for i in range(len(self)):
+            for i in xrange(len(self)):
                 self[i] -= other[i]
             return self
         else:
@@ -45,7 +45,7 @@ class Array(list):
     def __mul__(self, other):
         if isinstance(other, list):
             if len(other) != len(self): print "arrays must be the same size"; exit
-            for i in range(len(self)):
+            for i in xrange(len(self)):
                 self[i] *= other[i]
             return self
         else:
@@ -54,7 +54,7 @@ class Array(list):
     def __div__(self, other):
         if isinstance(other, list):
             if len(other) != len(self): print "arrays must be the same size"; exit
-            for i in range(len(self)):
+            for i in xrange(len(self)):
                 self[i] /= other[i]
             return self
         else:

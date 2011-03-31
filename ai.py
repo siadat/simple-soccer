@@ -149,8 +149,8 @@ class AStar:
             bottomright = self.to_node_pos(rect.bottomright)
             width  = int(abs(topleft[0] - bottomright[0]))
             height = int(abs(topleft[1] - bottomright[1]))
-            for y in range(0, height+1):
-                for x in range(0, width+1):
+            for y in xrange(0, height+1):
+                for x in xrange(0, width+1):
                     self.blocked_poses.append([topleft[0]+x,topleft[1]+y])
 
     def to_node_pos(self, pixel_pos):
@@ -168,15 +168,15 @@ class AStar:
             general.drawCircle(general.surface, pygame.Color(0,0,0), [x,y], 5,0)
 
     def draw_grid(self):
-        for i in range(0, self.sizex):
+        for i in xrange(0, self.sizex):
             x = (1.0 * i/self.sizex) * general.width
             general.drawLine(general.surface, pygame.Color(0,0,0), [x,0], [x,general.height])
-        for i in range(0, self.sizey):
+        for i in xrange(0, self.sizey):
             y = (1.0 * i/self.sizey) * general.height
             general.drawLine(general.surface, pygame.Color(0,0,0), [0,y], [general.width,y])
 
     #def create_all_nodes(self):
-    #    all_poses = [[x,y] for y in range(0,self.sizey) for x in range(0,self.sizex) ]
+    #    all_poses = [[x,y] for y in xrange(0,self.sizey) for x in xrange(0,self.sizex) ]
     #    self.all_nodes = [Node(pos=pos, g=0, h=self.calc_h(pos)) for pos in all_poses]
 
     def get_node(self, pos):
@@ -188,8 +188,8 @@ class AStar:
 
     def get_adjacents(self, node):
         ret = []
-        for y in range(int(node.pos[1]-1), int(node.pos[1]+1+1)):
-            for x in range(int(node.pos[0]-1), int(node.pos[0]+1+1)):
+        for y in xrange(int(node.pos[1]-1), int(node.pos[1]+1+1)):
+            for x in xrange(int(node.pos[0]-1), int(node.pos[0]+1+1)):
                 if not (x == node.pos[0] and y == node.pos[1]) and (x >= 0 and y >= 0) and (x < self.sizex and y < self.sizey) and not ([x,y] in self.blocked_poses):
                     adj_node = self.get_node([x,y])
                     if not (x == node.pos[0] or y == node.pos[1]):
