@@ -6,7 +6,7 @@ import creature
 class Ai:
     def __init__(self, player, goal1=None, goal2=None):
         if not isinstance(player, creature.CreatureBody):
-            print "AI says: You stupid!  You should give me a CreatureBody object!"
+            print("AI says: You should give me a CreatureBody object!")
             return
 
         self.player = player
@@ -19,7 +19,7 @@ class Ai:
 
     def do(self, state):
         if not isinstance(state, State):
-            print "AI says: You stupid git!  You should give me a State object!"
+            print("AI says: You should give me a State object!")
             return
 
         self.time += 1
@@ -211,7 +211,7 @@ class AStar:
                     min_f = node.f
 
             if next_node is None:
-                print "node is None"
+                print("node is None")
                 return path
 
             self.openlist.remove(next_node)

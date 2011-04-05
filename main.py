@@ -11,8 +11,8 @@ from field import *
 import ai
 # }}}
 
-if not pygame.font:  print 'Warning, fonts disabled'
-if not pygame.mixer: print 'Warning, sound disabled'
+if not pygame.font:  print('Warning, fonts disabled')
+if not pygame.mixer: print('Warning, sound disabled')
 
 def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None, playing=False, online=False):
     """ Run the simulation (e.g., game) with all the creatures (e.g., players and balls). """
@@ -174,7 +174,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
                 cc.collidingGoal(goal2)
                 ball.getKicked(cc)
                 if debug:
-                    print mouse_pos
+                    print(mouse_pos)
                 cc.acc = [ (random.random()-0.5)/5.0, (random.random()-0.5)/5.0]
                 cc.move(general.surface, field, counter, cameraPos=cameraPos, goal_size=goal_size)
 
