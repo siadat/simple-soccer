@@ -5,8 +5,8 @@ import general
 import creature
 class Ai:
     def __init__(self, player, goal1=None, goal2=None):
-        if not isinstance(player, creature.CreatureBody):
-            print("AI says: You should give me a CreatureBody object!")
+        if not isinstance(player, creature.Player):
+            print("AI says: You should give me a Player object!")
             return
 
         self.player = player

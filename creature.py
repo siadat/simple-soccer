@@ -230,8 +230,8 @@ class GeneralMovingBody(pygame.sprite.Sprite):
 
 # }}}
 
-# {{{ BallBody
-class BallBody(GeneralMovingBody):
+# {{{ Ball
+class Ball(GeneralMovingBody):
     """ Everything a ball needs to know. """
     def __init__(self, surface, radius, showing=True):
         GeneralMovingBody.__init__(self,surface=surface,size=[radius*2,radius*2],showing=True)
@@ -304,8 +304,8 @@ class BallBody(GeneralMovingBody):
 
 
 # }}}
-# {{{ CreatureBody
-class CreatureBody(GeneralMovingBody):
+# {{{ Player
+class Player(GeneralMovingBody):
     """ Everything a player needs to know."""
     def __init__(self, surface, size, type=1, showing=True):
         GeneralMovingBody.__init__(self,surface=surface,size=size,showing=True)
@@ -460,7 +460,7 @@ class CreatureBody(GeneralMovingBody):
 
 # }}}
 #{{{ CreatureBodyComputer 
-class CreatureBodyComputer(CreatureBody):
+class CreatureBodyComputer(Player):
     """ Everything about a computer creature."""
     def __init__(self, surface):
         GeneralMovingBody.__init__(self,surface=surface,size=[random.random()*30+20,random.random()*30+20],showing=True)

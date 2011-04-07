@@ -1,29 +1,26 @@
 # {{{ Imports
-import pygame, sys #, os
-#from general import *
-import general # import *
+import pygame, sys
+import general
 import random
 from pygame.locals import *
 from creature import *
-#from gp import *
-#from net import *
 from field import *
 import ai
+if not pygame.font:  print('Note: fonts disabled')
+#if not pygame.mixer: print('Note: sound disabled')
 # }}}
 
-if not pygame.font:  print('Warning, fonts disabled')
-if not pygame.mixer: print('Warning, sound disabled')
 
 def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None, playing=False, online=False):
     """ Run the simulation (e.g., game) with all the creatures (e.g., players and balls). """
-    number_of_players = 2
-    number_of_computer_creatures = 0
     number_of_balls = 1
+    number_of_players = 2
+    number_of_skulls = 0
 
 
     balls = list()
     players = list()
-    computer_creature = list()
+    skulls = list()
 
     if online: socket, isClient = tcp_connect(ip_address)
 
@@ -54,13 +51,13 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
         goal2 = field.getGoal2()
 
     for i in xrange(0,number_of_balls):
-        balls.append(BallBody(surface=general.surface, radius=6, showing=showing))
+        balls.append(Ball(surface=general.surface, radius=6, showing=showing))
 
     for i in xrange(0,number_of_players):
-        players.append( CreatureBody(general.surface,(20,20),number_of_players-i, showing) )
+        players.append( Player(general.surface,(20,20),number_of_players-i, showing) )
 
-    for i in xrange(0,number_of_computer_creatures):
-        computer_creature.append( CreatureBodyComputer( surface=general.surface ) )
+    for i in xrange(0,number_of_skulls):
+        skulls.append( CreatureBodyComputer( surface=general.surface ) )
     
     ai_state = ai.State(players[0], players[1], balls[0])
     my_ai = ai.Ai(players[1], goal1, goal2)
@@ -169,7 +166,7 @@ def creaturesTest(rootNode1_acc, rootNode2_acc, showing=False, time_length=None,
             for player in players:
                 ball.getKicked(player)
             # computer player colliding with the ball and the goal
-            for cc in computer_creature:
+            for cc in skulls:
                 cc.collidingGoal(goal1)
                 cc.collidingGoal(goal2)
                 ball.getKicked(cc)
