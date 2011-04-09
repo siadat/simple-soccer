@@ -63,7 +63,7 @@ class GeneralMovingBody(pygame.sprite.Sprite):
         self.health = 0.0
         self.age    = 0.0
         self.angle  = 0.0
-        self.fire_acc = 0.01
+        self.fire_acc = 0.04
         self.mass = 1.0
 
     def set_pos(self, pos):
@@ -347,10 +347,10 @@ class Player(GeneralMovingBody):
         """ Move the player. """
         """ stopping the player, if keyup """
         if self.stoppingx:
-            self.vel[0] += - self.vel[0]/15.0
+            self.vel[0] += - self.vel[0]/10.0
             self.acc[0] = 0
         if self.stoppingy:
-            self.vel[1] += - self.vel[1]/15.0
+            self.vel[1] += - self.vel[1]/10.0
             self.acc[1] = 0
         self.__newpos()
         if self.showing: self.__walk(cameraPos)
