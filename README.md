@@ -18,5 +18,9 @@ Requires Python and PyGame.
 #### TODO
 
 [ ] bug: computer gets stuck with or without the ball in the corners
-[ ] computer shoots at every frame, impossible to have the ball pass by him
-[ ] controlling the ball
+
+[ ] bug: computer push the ball up or behind the goal
+
+[ ] bug: computer shoots at every frame, impossible to have the ball pass by him
+
+[ ] feature: controlling the ball
